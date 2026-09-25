@@ -1,0 +1,55 @@
+\ProvidesPackage{shah311}
+
+\usepackage{amsmath}
+\usepackage{nicematrix}
+\usepackage{extpfeil}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{nameref}
+\usepackage[x11names]{xcolor}
+\usepackage[most]{tcolorbox}
+
+\pgfplotsset{compat=1.18}
+\printanswers
+
+\newcommand{\ZZ}{\mathbb Z}
+\newcommand{\QQ}{\mathbb Q}
+\newcommand{\NN}{\mathbb N}
+\newcommand{\RR}{\mathbb R}
+\newcommand{\CC}{\mathbb C}
+
+\newcommand{\braces}[1]{\ensuremath{\left\{#1 \right\}}}
+\newcommand{\st}{\text{ s.t. }}
+
+\newcommand{\pick}[2]{\ensuremath{\begin{pmatrix}#1 \\ #2 \end{pmatrix}}}
+
+
+\hypersetup{colorlinks=true, linktoc=section, linkcolor=blue}
+
+\tcbuselibrary{theorems}
+
+\NewTcbTheorem[number within=subsection]{example}{Example}%
+{breakable, colback=orange!5,colframe=orange!35!black,fonttitle=\bfseries}{th} 
+\newenvironment{impbox}[1]{\begin{tcolorbox}[colback=LightSteelBlue2, breakable, sharp corners, title=#1]}{\end{tcolorbox}}
+\newenvironment{defbox}[1]{\begin{tcolorbox}[colback=green!25!white, breakable, sharp corners, title=#1]}{\end{tcolorbox}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{remark}{Remark}
+
+\newenvironment{thm}[1]{\begin{tcolorbox}[colback=LightSalmon1, breakable, sharp corners]\begin{theorem}[#1]}{\end{theorem}\end{tcolorbox}}
+
+\newenvironment{coro}{\begin{tcolorbox}[colback=Gold2, breakable, sharp corners]\begin{corollary}}{\end{corollary}\end{tcolorbox}}
+
+\newenvironment{prop}[1]{\begin{tcolorbox}[colback=DarkOrchid2!40!white, breakable, sharp corners]\begin{proposition}[#1]}{\end{proposition}\end{tcolorbox}}
+
+\newenvironment{lma}[1]{\begin{tcolorbox}[colback=DeepSkyBlue1, breakable, sharp corners]\begin{lemma}[#1]}{\end{lemma}\end{tcolorbox}}
+
+\newenvironment{rmk}[1]{\begin{tcolorbox}[colback=Cornsilk3, breakable, sharp corners]\begin{remark}[#1]}{\end{remark}\end{tcolorbox}}
