@@ -1,0 +1,114 @@
+\documentclass{exam}
+\usepackage{../../shah311}
+\usepackage{venndiagram}
+\usepackage[linguistics]{forest}
+
+\hypersetup{colorlinks=true, linktoc=section, linkcolor=blue}
+
+\pagestyle{headandfoot}
+\firstpageheadrule
+\runningheadrule
+\firstpageheader{Name: Jeevan Shah}{Math 477 Homework 2}{RU ID: 242001315 \\ netID: jds508}
+\runningheader{Name: Jeevan Shah}{Math 477 Homework 2}{RU ID: 242001315 \\ netID: jds508}
+\firstpagefooter{}{}{}
+\runningfooter{ }{\thepage}{ }
+
+\printanswers
+
+\begin{document}
+\colorbox{red}{\underline{1:}}  Suppose there are 1000 students living in a certain dorm on Busch campus, of whom \\
+600 are CS majors, \\
+200 are Stat majors,\\
+100 are Math majors,\\
+90 are CS \& Stat double majors (double majors are included in the number of single majors)\\
+50 are CS \& Math double majors\\
+60 are Stat \& Math double majors, and\\
+20 are CS \& Stat \& Math triple majors (these are also counted as double and single majors).
+What is the probability that a randomly selected student living in this dorm is…
+\begin{parts}
+    \part …majoring in at least one of CS, Stat or Math?
+    \part …majoring in Math or double majoring in CS \& Stat?
+    \begin{solution}
+        We start by making a venn diagram of the entire space 
+        \begin{center}
+            \begin{venndiagram3sets}[labelOnlyA={480},labelOnlyB={70},labelOnlyC={10},
+            labelOnlyAB={70},labelOnlyAC={30},labelOnlyBC={40},labelABC={20},
+            labelNotABC={280}]
+                \setpostvennhook{
+                    \draw[<-] (labelA) -- ++(135:3cm) node[above] {C.S. Majors};
+                    \draw[<-] (labelB) -- ++(45:3cm) node[above] {Stat Majors};
+                    \draw[<-] (labelC) -- ++(-90:3cm) node[below] {Math Majors};
+                    \draw[<-] (labelNotABC) -- ++(-135:3cm) node[below,text width=4cm,align=flush left] {280 non C.S./Stat/Math Majors};
+                }
+            \end{venndiagram3sets}
+        \end{center}
+
+        \begin{parts}
+            \part Now we can clearly see that there are $720$ total math/c.s./stats majors in the dorm so 
+            \[
+                P(\text{student is a math/c.s./stats major}) = \frac{720}{1000} = \frac{72}{100} = \boxed{0.72 = 72\%}
+            \]
+
+            \part Using the venn diagram we have 
+            \begin{align*}
+                P(&\text{student is a math major, or a CS and Stat double major}) \\ 
+                &= P(\text{student is a math major}) + P(\text{student is a CS and Stat double major}) \\
+                &\quad - P(\text{student is a math major and a CS and Stat double major}) \\
+                &= \frac{100}{1000} + \frac{90}{1000} - \frac{20}{1000} \\
+                &= \frac{17}{100} \\
+                &= \boxed{0.17 = 17\%}
+            \end{align*}
+        \end{parts}
+    \end{solution}
+\end{parts}
+
+
+\colorbox{red}{\underline{2:}} An urn contains 10 balls: 4 red and 6 blue. A second urn contains 16 red balls and an unknown number of blue balls. A single ball is drawn from each urn. The probability that both balls are the same color is 0.44. Calculate the number of blue balls in the second urn.
+
+\begin{oneparchoices}
+    \CorrectChoice 4 
+    \choice 20 
+    \choice 24 
+    \choice 44 
+    \choice 64
+\end{oneparchoices}
+\begin{solution}
+    Let $x$ be the number of blue balls in the other urn. We'll have $b$ stand for blue and $r$ for red, while the subscript $1$ or $2$ will indicate whether that color ball is drawn on the first or second turn. Without loss of generality we assume the urn with 10 balls is drawn from first.
+    \begin{center}
+        \begin{forest}
+            [
+                [
+                    $b_1 \left(\frac{6}{10}\right)$ 
+                    [
+                        $b_2 \left(\frac{x}{16+x}\right)$
+                    ]
+                    [
+                        $r_2 \left(\frac{16}{16+x}\right)$
+                    ]
+                ]
+                [
+                    $r_1 \left(\frac{4}{10}\right)$
+                    [
+                        $b_2 \left(\frac{x}{16+x}\right)$
+                    ]
+                    [
+                        $r_2 \left(\frac{16}{16+x}\right)$
+                    ]
+                ]
+            ]
+        \end{forest}
+    \end{center}
+    Since the total probability of drawing two balls of the same color is $P = 0.44$ we can set the following equation and solve for $x$: 
+    \begin{align*}
+        &\left(\frac{6}{10} \cdot \frac{x}{16 + x}\right) + \left(\frac{4}{10} \cdot \frac{16}{16 + x}\right) = 0.44 \\
+        \Rightarrow& \frac{6x}{160 + 10x} + \frac{64}{160+10x} = 0.44 \\
+        \Rightarrow& \frac{64 + 6x}{160 + 10x} = 0.44 \\
+        \Rightarrow& 64 + 6x = 4.4x + 70.4 \\
+        \Rightarrow& 1.6x = 6.4 \\
+        \Rightarrow&\, \boxed{x = 4}
+    \end{align*}
+    and thus \fbox{A} is the correct answer.
+\end{solution}
+\footnotetext{\LaTeX\, code for this document can be found on github \href{https://github.com/jeevanshah07/MATH477/blob/main/homework/homework2/main.tex}{\underline{here}}}
+
+\end{document}
