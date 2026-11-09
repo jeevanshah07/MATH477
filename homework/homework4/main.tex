@@ -1,0 +1,95 @@
+\documentclass{exam}
+\usepackage{../../shah311}
+
+\hypersetup{colorlinks=true, linktoc=section, linkcolor=blue}
+
+\pagestyle{headandfoot}
+\firstpageheadrule
+\runningheadrule
+\firstpageheader{Name: Jeevan Shah}{Math 477 Homework 4}{RU ID: 242001315 \\ netID: jds508}
+\runningheader{Name: Jeevan Shah}{Math 477 Homework 4}{RU ID: 242001315 \\ netID: jds508}
+\firstpagefooter{}{}{}
+\runningfooter{ }{\thepage}{ }
+
+\printanswers
+
+\begin{document}
+\colorbox{red}{\underline{1:}} An insurance company determines that $N$, the number of claims received in a week, satisfies $\Pr[N = n] = \frac{1}{2^{n+1}}$ where $n \geq 0$.
+
+The company also determines that the number of claims received in a given week is independent of the number of claims received in any other week.
+
+Determine the probability that exactly seven claims will be received during a two-week period.
+
+\begin{oneparchoices}
+    \choice $\frac{1}{256}$
+    \choice $\frac{1}{128}$
+    \choice $\frac{7}{512}$
+    \CorrectChoice $\frac{1}{64}$
+    \choice $\frac{1}{32}$
+\end{oneparchoices}
+\begin{solution}
+    Let $N_1$ and $N_2$ be the number of claims received in the first and second week respectively. Exactly seven claims are received if $N_1 = k$ and $N_2 = 7 - k$ for some $k \in \{0, 1, \dots, 7\}$, so by independence
+    \begin{align*}
+        \Pr[N_1 + N_2 = 7] &= \sum_{k=0}^{7} \Pr[N_1 = k]\Pr[N_2 = 7 - k] \\
+        &= \sum_{k=0}^{7} \frac{1}{2^{k+1}} \cdot \frac{1}{2^{8-k}} \\
+        &= \sum_{k=0}^{7} \frac{1}{2^{9}} \\
+        &= \frac{8}{512} \\
+        &= \boxed{\frac{1}{64}}
+    \end{align*}
+    and thus \fbox{D} is the correct answer.
+\end{solution}
+
+\colorbox{red}{\underline{2:}} The ages of students enrolling in Mathematical Theory of Probability has a cumulative probability distribution given by:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+$x$    & 17  & 18   & 19   & 20   & 21   & 22   & 23   \\ \hline
+$F(x)$ & 0   & 0.18 & 0.47 & 0.85 & 0.94 & 0.99 & 1.00 \\ \hline
+\end{tabular}
+\end{center}
+
+\begin{parts}
+    \part Calculate the expected value for $X$
+    \part Calculate the variance for $X$
+    \part Calculate the standard deviation for $X$
+\end{parts}
+\begin{solution}
+    We first recover the probability mass function using $p(x) = F(x) - F(x-1)$:
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|}
+    \hline
+    $x$    & 17 & 18   & 19   & 20   & 21   & 22   & 23   \\ \hline
+    $p(x)$ & 0  & 0.18 & 0.29 & 0.38 & 0.09 & 0.05 & 0.01 \\ \hline
+    \end{tabular}
+    \end{center}
+    \begin{parts}
+        \part
+        \begin{align*}
+            E[X] &= \sum_x x\,p(x) \\
+            &= 18(0.18) + 19(0.29) + 20(0.38) + 21(0.09) + 22(0.05) + 23(0.01) \\
+            &= 3.24 + 5.51 + 7.60 + 1.89 + 1.10 + 0.23 \\
+            &= \boxed{19.57}
+        \end{align*}
+
+        \part We first compute
+        \begin{align*}
+            E[X^2] &= \sum_x x^2\,p(x) \\
+            &= 324(0.18) + 361(0.29) + 400(0.38) + 441(0.09) + 484(0.05) + 529(0.01) \\
+            &= 58.32 + 104.69 + 152 + 39.69 + 24.2 + 5.29 \\
+            &= 384.19
+        \end{align*}
+        so
+        \[
+            \mathrm{Var}(X) = E[X^2] - (E[X])^2 = 384.19 - 19.57^2 = 384.19 - 382.9849 = \boxed{1.2051}
+        \]
+
+        \part
+        \[
+            \sigma_X = \sqrt{\mathrm{Var}(X)} = \sqrt{1.2051} \approx \boxed{1.0978}
+        \]
+    \end{parts}
+\end{solution}
+\footnotetext{\LaTeX\, code for this document can be found on github \href{https://github.com/jeevanshah07/MATH477/blob/main/homework/homework4/main.tex}{\underline{here}}}
+
+\end{document}

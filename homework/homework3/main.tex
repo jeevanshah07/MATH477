@@ -1,0 +1,88 @@
+\documentclass{exam}
+\usepackage{../../shah311}
+\usepackage[linguistics]{forest}
+
+\hypersetup{colorlinks=true, linktoc=section, linkcolor=blue}
+
+\pagestyle{headandfoot}
+\firstpageheadrule
+\runningheadrule
+\firstpageheader{Name: Jeevan Shah}{Math 477 Homework 3}{RU ID: 242001315 \\ netID: jds508}
+\runningheader{Name: Jeevan Shah}{Math 477 Homework 3}{RU ID: 242001315 \\ netID: jds508}
+\firstpagefooter{}{}{}
+\runningfooter{ }{\thepage}{ }
+
+\printanswers
+
+\begin{document}
+\colorbox{red}{\underline{1:}} Ten percent of a company's life insurance policyholders are smokers. The rest are non-smokers. For each non-smoker, the probability of dying during the year is 0.01. For each smoker, the probability of dying during the year is 0.05. Given that a policyholder died, what is the probability that the policyholder was a smoker?
+\begin{solution}
+    Let $S$ be the event that a policyholder is a smoker and $D$ the event that a policyholder dies during the year.
+    \begin{center}
+        \begin{forest}
+            [
+                [
+                    $S \left(0.1\right)$
+                    [
+                        $D \left(0.05\right)$
+                    ]
+                    [
+                        $D^c \left(0.95\right)$
+                    ]
+                ]
+                [
+                    $S^c \left(0.9\right)$
+                    [
+                        $D \left(0.01\right)$
+                    ]
+                    [
+                        $D^c \left(0.99\right)$
+                    ]
+                ]
+            ]
+        \end{forest}
+    \end{center}
+    By Bayes' formula we have
+    \begin{align*}
+        P(S \mid D) &= \frac{P(D \mid S)P(S)}{P(D \mid S)P(S) + P(D \mid S^c)P(S^c)} \\
+        &= \frac{(0.05)(0.1)}{(0.05)(0.1) + (0.01)(0.9)} \\
+        &= \frac{0.005}{0.014} \\
+        &= \boxed{\frac{5}{14} \approx 0.357}
+    \end{align*}
+\end{solution}
+
+\colorbox{red}{\underline{2:}} An actuary studying the insurance preferences of automobile owners makes the following conclusions:
+\begin{enumerate}
+    \item[(i)] An automobile owner is twice as likely to purchase collision coverage as disability coverage.
+    \item[(ii)] The event that an automobile owner purchases collision coverage is independent of the event that he or she purchases disability coverage.
+    \item[(iii)] The probability that an automobile owner purchases both collision and disability coverages is 0.15.
+\end{enumerate}
+Calculate the probability that an automobile owner purchases neither collision nor disability coverage.
+
+\begin{oneparchoices}
+    \choice 0.18
+    \CorrectChoice 0.33
+    \choice 0.48
+    \choice 0.67
+    \choice 0.82
+\end{oneparchoices}
+\begin{solution}
+    Let $C$ be the event that an owner purchases collision coverage and $D$ the event that an owner purchases disability coverage. From (i) we have $P(C) = 2P(D)$, and from (ii) and (iii) we have
+    \begin{align*}
+        &P(C \cap D) = P(C)P(D) = 0.15 \\
+        \Rightarrow& 2P(D)^2 = 0.15 \\
+        \Rightarrow& P(D) = \sqrt{0.075} \approx 0.2739 \\
+        \Rightarrow& P(C) = 2\sqrt{0.075} \approx 0.5477
+    \end{align*}
+    So by inclusion-exclusion
+    \begin{align*}
+        P(C^c \cap D^c) &= 1 - P(C \cup D) \\
+        &= 1 - \left(P(C) + P(D) - P(C \cap D)\right) \\
+        &\approx 1 - (0.5477 + 0.2739 - 0.15) \\
+        &= \boxed{0.3284 \approx 0.33}
+    \end{align*}
+    and thus \fbox{B} is the correct answer.
+\end{solution}
+\footnotetext{\LaTeX\, code for this document can be found on github \href{https://github.com/jeevanshah07/MATH477/blob/main/homework/homework3/main.tex}{\underline{here}}}
+
+\end{document}

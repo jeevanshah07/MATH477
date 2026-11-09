@@ -1,0 +1,1558 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{needspace}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
+
+\let\oldsubsection\subsection
+\renewcommand{\subsection}{\Needspace{14\baselineskip}\oldsubsection}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlist{itemsep=1pt,topsep=2pt}
+
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Math 477 -- Midterm 1 Study Guide}
+\rhead{Jeevan Shah}
+\cfoot{\thepage}
+
+% ---------- macros ----------
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\SD}{\operatorname{SD}}
+\newcommand{\nCr}[2]{\binom{#1}{#2}}
+\newcommand{\nPr}[2]{{}_{#1}P_{#2}}
+\newcommand{\mc}{\mathcal}
+
+% ---------- boxes ----------
+\tcbset{enhanced jigsaw,breakable,pad at break*=1mm,before skip=8pt,after skip=8pt,fonttitle=\bfseries}
+\newtcolorbox{defbox}[1][]{colback=blue!4,colframe=blue!55!black,title={#1}}
+\newtcolorbox{thmbox}[1][]{colback=red!4,colframe=red!55!black,title={#1}}
+\newtcolorbox{exbox}[1][Worked example]{colback=green!4,colframe=green!40!black,title={#1}}
+\newtcolorbox{warnbox}[1][Watch out]{colback=orange!8,colframe=orange!70!black,title={#1}}
+\newtcolorbox{ideabox}[1][In plain English]{colback=teal!6,colframe=teal!55!black,title={#1}}
+\newtcolorbox{methodbox}[1][Step-by-step method]{colback=violet!5,colframe=violet!55!black,title={#1}}
+
+\title{\textbf{Math 477 -- Midterm 1 Study Guide}\\[2pt]
+\large A from-scratch, self-contained guide: Counting, Axioms of Probability,\\
+Conditional Probability \& Independence, Discrete Random Variables}
+\author{Jeevan Shah}
+\date{Exam: Thursday, October 15, 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\begin{tcolorbox}[colback=gray!8,colframe=gray!60,title=How to use this guide]
+\textbf{This guide assumes you have not been to class.} Every chapter starts from the ground up: first a plain-English explanation, then the precise definition (the exam wants definitions that are \emph{precise and unambiguous}), then the formulas with proofs, then worked examples explained step by step, then common mistakes.\par
+\medskip
+\textbf{Colors.} \colorbox{blue!8}{blue} = precise definition; \colorbox{red!8}{red} = theorem/formula; \colorbox{teal!12}{teal} = plain-English intuition; \colorbox{violet!10}{purple} = step-by-step method; \colorbox{green!10}{green} = worked example; \colorbox{orange!15}{orange} = common mistake.\par
+\medskip
+\textbf{Scope (Prof.'s email).} Everything through Sec.\ 4.5. \textbf{Not tested:} 1.6, 2.6, 2.7, 3.5, proof by induction, and everything from 4.6 on (binomial, Poisson, \dots).\par
+\medskip
+\textbf{Prof.'s priority order.} (1) the review sheet (Sections~\ref{sec:checklist} and~\ref{sec:practice} here); (2) textbook \emph{Self-Test Problems and Exercises} --- expect 1--2 similar questions (full solutions in Section~\ref{sec:selftest}); (3) hand-in homework; (4) lecture problems; (5) other problems; (6) odd textbook details.\par
+\medskip
+\textbf{Grading note.} Definitions must be precise and unambiguous; grammar and spelling are not graded.\par
+\medskip
+\textbf{Sources.} (lecture) = from Prof.\ Salamon's notes. (Ross Ex.\ xx) = textbook example (Ross, \emph{A First Course in Probability}, 10th ed.); section numbers match the book. Anything marked \emph{(extra)} is an additional example I added for practice and computed myself.\par
+\medskip
+\textbf{Suggested order if you are starting cold:} read Section~\ref{sec:primer} (vocabulary and math toolbox), then do each chapter in order, \emph{doing} the worked examples with the solution covered. Then do the review-sheet problems, then the Self-Test problems.
+\end{tcolorbox}
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+\clearpage
+\setcounter{section}{-1}
+
+%=====================================================================
+\section{Start Here: Vocabulary, Notation, and the Math Toolbox}\label{sec:primer}
+%=====================================================================
+
+\subsection{What is this course about?}
+
+\begin{ideabox}
+\textbf{Probability} is a number between $0$ and $1$ that measures how likely something is. $0$ = impossible, $1$ = certain, $\tfrac12$ = a fair coin landing heads. The course (and this exam) has two jobs:
+\begin{enumerate}
+\item \textbf{Counting} (Ch.~1): ``how many ways can this happen?'' Many probabilities are just \emph{(number of ways the thing you want can happen)} $\div$ \emph{(total number of ways anything can happen)}.
+\item \textbf{Rules} (Ch.~2--4): how to combine probabilities. ``A \emph{or} B'' (add, then subtract overlap), ``A \emph{and} B'' (multiply, using conditional probability), ``given that'' (shrink the universe), ``reverse the condition'' (Bayes), and finally assigning \emph{numbers} to outcomes (random variables) and averaging them (expected value).
+\end{enumerate}
+\end{ideabox}
+
+\subsection{Vocabulary you must know cold}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.5in}>{\raggedright\arraybackslash}p{4.5in}@{}}
+\toprule
+\textbf{Term} & \textbf{Meaning (with a die/coin example)}\\
+\midrule
+Experiment & Any process with an uncertain result. E.g.\ roll a die; flip two coins.\\
+Outcome & One single possible result of the experiment. Rolling a die: ``4''. Two flips: ``$(h,t)$'' (first heads, second tails).\\
+Sample space $S$ & The set of \emph{all} possible outcomes. Die: $S=\{1,2,3,4,5,6\}$. Two coins: $S=\{(h,h),(h,t),(t,h),(t,t)\}$.\\
+Event & A \emph{subset} of $S$ (a collection of outcomes). ``Roll is even'' $=\{2,4,6\}$. We say the event \emph{occurs} if the actual outcome is in it.\\
+Probability $P(E)$ & A number assigned to each event, obeying the 3 axioms (Sec.~2.2).\\
+Mutually exclusive & Two events that cannot both happen: $E\cap F=\emptyset$. (``Roll is 2'' and ``roll is 5''.)\\
+Exhaustive (collection) & A collection of events whose union is all of $S$: at least one must happen.\\
+Partition & Events that are mutually exclusive \emph{and} exhaustive: exactly one happens. (Used in Bayes' formula.)\\
+Independent & Knowing one happened tells you nothing about the other: $P(EF)=P(E)P(F)$.\\
+Conditional probability & $P(E\mid F)$: probability of $E$ \emph{given} that $F$ occurred.\\
+Random variable (R.V.) & A rule that turns each outcome into a number. $X=$ number of heads in 2 flips.\\
+PMF & For a discrete R.V.: the table of $p(x)=P(X=x)$.\\
+CDF & $F(x)=P(X\le x)$.\\
+Expected value $\E[X]$ & Probability-weighted average of the values of $X$ (the ``long-run average'').\\
+Variance $\Var[X]$ & Average squared distance from the mean: how spread out $X$ is.\\
+With / without replacement & Draw an item, \emph{put it back} (can be drawn again) vs.\ keep it out.\\
+Distinguishable & Objects you can tell apart (people, labelled balls). \emph{Indistinguishable}: identical copies (the three S's in MISSISSIPPI --- swapping them changes nothing).\\
+Ordered vs.\ unordered & Does the \emph{sequence} matter (a line-up, a PIN) or only \emph{who/what} is chosen (a committee, a hand of cards)?\\
+Fair / random / uniformly & ``Fair coin/die'', ``chosen at random'', ``randomly selected'' all mean \textbf{every outcome is equally likely}. That is what licenses $P(E)=N(E)/N(S)$.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Set notation primer (events are sets)}
+
+Because events are subsets of $S$, we use set language. Running example: roll one die, $S=\{1,2,3,4,5,6\}$, $E=\{2,4,6\}$ (even), $F=\{1,2,3\}$ (at most 3).
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.3in}>{\raggedright\arraybackslash}p{2.7in}>{\raggedright\arraybackslash}p{2.2in}@{}}
+\toprule
+\textbf{Symbol} & \textbf{Reads as / meaning} & \textbf{Die example}\\
+\midrule
+$x\in A$ & $x$ is a member of $A$ & $4\in E$\\
+$A\subseteq B$ & every element of $A$ is in $B$ (``$A$ implies $B$'') & $\{2\}\subseteq E$\\
+$\emptyset$ & empty set (impossible event) & ``roll a 7''\\
+$A\cup B$ & \textbf{or}: in $A$, or in $B$, or both & $E\cup F=\{1,2,3,4,6\}$\\
+$A\cap B$ \;or\; $AB$ & \textbf{and}: in both $A$ and $B$ & $E\cap F=\{2\}$\\
+$A^c$ (also $A'$) & \textbf{not}: everything in $S$ not in $A$ & $E^c=\{1,3,5\}$\\
+$A-B$ & in $A$ but not in $B$ ($=AB^c$) & $E-F=\{4,6\}$\\
+$N(A)$ or $n(A)$ & number of elements in $A$ & $N(E)=3$\\
+$\bigcup_{i=1}^n E_i$ & at least one of $E_1,\dots,E_n$ occurs & \\
+$\bigcap_{i=1}^n E_i$ & all of $E_1,\dots,E_n$ occur & \\
+\bottomrule
+\end{tabular}
+\end{center}
+Note $S^c=\emptyset$ and $\emptyset^c=S$. Lecture note: always know your \emph{universe} $U$ (the set the complement is taken in).
+
+\subsection{Math toolbox (things the course quietly assumes)}
+
+\begin{defbox}[Factorial]
+$n!=n(n-1)(n-2)\cdots 2\cdot 1$ for a positive integer $n$, and $0!=1$ by definition. Also $n!=n\,(n-1)!$.\\
+Examples: $3!=6$, $4!=24$, $5!=120$, $6!=720$, $7!=5040$, $10!=3{,}628{,}800$.\\
+\emph{Cancelling:} $\dfrac{10!}{8!}=10\cdot 9=90$ (write $10!=10\cdot9\cdot8!$ and cancel). Never compute huge factorials---cancel first.
+\end{defbox}
+
+\begin{defbox}[Summation notation]
+$\displaystyle\sum_{i=1}^{n}a_i=a_1+a_2+\cdots+a_n$. Rules (lecture): $\sum_{i=1}^n c=cn$; $\sum cx_i=c\sum x_i$; $\sum(x_i\pm y_i)=\sum x_i\pm\sum y_i$.\\
+\textbf{These do not work for products or quotients:} $\sum x_iy_i\neq\left(\sum x_i\right)\left(\sum y_i\right)$.\\
+A \emph{weighted average} of values $x_i$ with weights $w_i$ is $\dfrac{\sum w_ix_i}{\sum w_i}$. (Expected value is the weighted average where the weights are probabilities, which sum to 1.)
+\end{defbox}
+
+\begin{defbox}[Two series you will meet]
+\textbf{Geometric series:} for $|r|<1$, $\;a+ar+ar^2+\cdots=\dfrac{a}{1-r}$. Example: $\tfrac12+\tfrac14+\tfrac18+\cdots=\dfrac{1/2}{1-1/2}=1$.\\
+\textbf{Exponential series:} $e^{\lambda}=\displaystyle\sum_{i=0}^{\infty}\frac{\lambda^i}{i!}=1+\lambda+\frac{\lambda^2}{2}+\frac{\lambda^3}{6}+\cdots$ (used once, in a normalization example, Ross Sec.~4.2, Ex.~2a).
+\end{defbox}
+
+\subsection{Translating English into math}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.3in}>{\raggedright\arraybackslash}p{3.9in}@{}}
+\toprule
+\textbf{Words in the problem} & \textbf{What to do}\\
+\midrule
+``A \textbf{or} B'' & $P(A\cup B)=P(A)+P(B)-P(AB)$ (just add if mutually exclusive)\\
+``A \textbf{and} B'', ``both'' & $P(AB)=P(A)P(B\mid A)$ (just $P(A)P(B)$ if independent)\\
+``\textbf{not} A'', ``other than A'' & $P(A^c)=1-P(A)$\\
+``\textbf{at least one}'' & \textbf{Complement:} $1-P(\text{none})$. Almost always easier.\\
+``\textbf{at most} $k$'' & $P(0)+P(1)+\cdots+P(k)$, or complement\\
+``\textbf{exactly} $k$'' & count exactly $k$ (not ``$k$ or more'')\\
+``\textbf{neither}'', ``none'' & $P(A^cB^c)=1-P(A\cup B)$\\
+``\textbf{given that}'', ``if we know'', ``\textbf{what is the probability it was}\dots'' & Conditional probability $P(\cdot\mid\cdot)$; the thing after ``given'' goes \emph{after} the bar and in the \emph{denominator}\\
+``mutually exclusive'', ``cannot both happen'' & $AB=\emptyset$\\
+``independent'' & $P(AB)=P(A)P(B)$\\
+``at random'', ``fair'', ``randomly selected'' & equally likely outcomes $\Rightarrow$ $N(E)/N(S)$\\
+``in order'', ``arranged'', ``lined up'', ``ranked'' & order matters (permutation)\\
+``a committee/group/hand/subset of $r$'' & order does not matter (combination)\\
+``same kind must be together'' & glue the kind into a block, then arrange blocks and arrange inside blocks\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{How to attack any problem on this exam}
+
+\begin{methodbox}[The 6-step routine]
+\begin{enumerate}
+\item \textbf{Name the experiment and write down $S$} (or at least how big it is). Are the outcomes equally likely? If not, you may \emph{not} use $N(E)/N(S)$.
+\item \textbf{Name the events} with letters ($A=$ ``auto policy'', $D=$ ``has the disease'', \dots). Translate each phrase of the question into a probability statement using the table above.
+\item \textbf{Pick the tool:} counting (Ch.~1)? union/complement (Ch.~2)? conditional/tree/Bayes (Ch.~3)? independence? random variable table (Ch.~4)?
+\item \textbf{Compute}, keeping fractions exact until the end (e.g.\ $\tfrac{17}{33}$, not $0.5151$). Leave answers as expressions like $\binom{52}{5}$ if the problem allows---ask whether decimals are required.
+\item \textbf{Sanity check:} every probability in $[0,1]$; a PMF sums to 1; the complement adds to 1; the answer is the right order of magnitude.
+\item \textbf{Write the answer in a sentence} or box it. Show the setup (the formula you used) --- partial credit lives there.
+\end{enumerate}
+\end{methodbox}
+
+\clearpage
+%=====================================================================
+\section{Chapter 1 -- Combinatorial Analysis (Counting)}\label{sec:ch1}
+%=====================================================================
+
+\begin{ideabox}[Why counting comes first]
+When all outcomes of an experiment are equally likely,
+\[ \text{probability}=\frac{\text{number of outcomes you want}}{\text{total number of outcomes}}, \]
+so you need to be able to count both numbers \emph{without listing them}. Ross's opening example: $n$ antennas in a row, $m$ of them defective (identical-looking), and the system works if no two defective ones are adjacent. For $n=4,m=2$ there are $\binom42=6$ ways the defectives can sit, and exactly $3$ of them have no two adjacent: positions $\{1,3\},\{1,4\},\{2,4\}$. The general answer comes from the tools below (Ex.\ 4c).
+\end{ideabox}
+
+%---------------------------------------------------------------------
+\subsection{The Basic Principle of Counting (Sec.\ 1.2)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+Think of a \textbf{decision tree}. You make a sequence of choices (stages). If stage 1 has $m$ options, and \emph{no matter which you choose} stage 2 has $n$ options, the tree has $m\cdot n$ leaves. Each leaf is one complete outcome. \textbf{``And then'' $\Rightarrow$ multiply.} \textbf{``Or'' (alternative cases that cannot overlap) $\Rightarrow$ add.}
+\end{ideabox}
+
+\begin{defbox}[Basic Principle of Counting (multiplication principle)]
+If experiment 1 has $m$ possible outcomes and, for \emph{each} outcome of experiment 1, experiment 2 has $n$ possible outcomes, then the two experiments together have $mn$ possible outcomes. In lecture notation, for stages $A$ and $B$: $N(S)=N(A)\cdot N(B)$.\\
+\textbf{Generalized principle:} for $r$ stages where stage $i$ has $n_i$ outcomes (regardless of the results of earlier stages),
+\[ N(S)=n_1\,n_2\cdots n_r. \]
+\textbf{Addition principle (cases):} if a task can be done in one of several \emph{mutually exclusive} ways, with $a$ ways for case 1, $b$ ways for case 2, \dots, the total is $a+b+\cdots$.
+\end{defbox}
+
+\textbf{Proof idea.} List the outcomes as an $m\times n$ array of pairs $(i,j)$: $m$ rows, each with $n$ entries, so $mn$ entries.
+
+\begin{methodbox}
+\begin{enumerate}
+\item Decide what a complete outcome looks like (a license plate = 7 slots; a committee = a pair of choices; \dots).
+\item List the stages (slots) in some order. \textbf{Handle the most restricted slot first} (e.g.\ ``first digit cannot be 0'').
+\item For each stage write the number of options \emph{given earlier choices} (without replacement: the count shrinks).
+\item Multiply. If there are separate cases (``either \dots\ or \dots''), compute each case and add.
+\item ``Not allowed'' cases: either build the restriction into the stages, or count everything and \textbf{subtract the forbidden outcomes} (careful about \emph{what} you subtract---see the lecture example below).
+\end{enumerate}
+\end{methodbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(Ross Ex.\ 2a)} A community has 10 women, each with 3 children. Choose a woman, then one of her children: $10\cdot3=30$ ways. (Stage 1: 10 options. Stage 2: 3 options, whoever was chosen.)
+\item \textbf{(Ross Ex.\ 2b)} A class has 3 freshmen, 4 sophomores, 5 juniors, 2 seniors. A subcommittee with one student from each class: $3\cdot4\cdot5\cdot2=120$.
+\item \textbf{(Ross Ex.\ 2c)} 7-place license plates, the first 3 slots letters and the last 4 slots digits: $26^3\cdot10^4=175{,}760{,}000$. \textbf{(Ross Ex.\ 2e)} Same, but no letter or digit may repeat: $26\cdot25\cdot24\cdot10\cdot9\cdot8\cdot7=78{,}624{,}000$ (each slot has one fewer option than the previous slot of the same type).
+\item \textbf{(Ross Ex.\ 2d)} A function from $\{1,\dots,n\}$ to $\{0,1\}$ assigns one of 2 values to each of $n$ points: $2^n$ functions.
+\item \textbf{(lecture)} A coin and a die: $2\cdot6=12$ outcomes. A coin and two dice: $2\cdot6\cdot6=72$.
+\item \textbf{(lecture)} Plates with 3 digits followed by 4 letters: $10^3\cdot26^4=456{,}976{,}000$. \emph{Now 7 particular four-letter words are prohibited:} the digits are unaffected, the letters have $26^4-7$ options, so the answer is $10^3(26^4-7)=456{,}969{,}000$. \textbf{Not} $10^3\cdot26^4-7$: that would remove only 7 plates in total, but each prohibited word kills $10^3$ plates (one for each digit string).
+\item \textbf{(Review \#2)} 7-digit phone numbers, first digit not 0 or 1, and the number must not begin 555: digits 2--9 for the first place gives $8\cdot10^6$ numbers; those starting 555 number $10^4$ (the last four digits are free; the leading 5 is allowed); $8\cdot10^6-10^4=7{,}990{,}000$. (Worked in detail in Sec.~\ref{sec:practice}.)
+\item \textbf{(extra)} 3-digit numbers (100--999) with no repeated digit: first digit 1--9 (9 options), second digit any digit except the first (9 options, 0 is allowed now), third any digit except the first two (8): $9\cdot9\cdot8=648$.
+\item \textbf{(extra)} 4-digit numbers (1000--9999) that are even: first digit 9 options, middle two digits 10 each, last digit must be even (5): $9\cdot10\cdot10\cdot5=4500$. (Restricted slot = last digit; do it independently.)
+\item \textbf{(extra, addition principle)} Travel from city $P$ to $Q$ by bus (3 routes) or by train (2 routes): $3+2=5$ ways. Travel $P\to Q$ then $Q\to R$ (4 ways) by any of these: $5\cdot4=20$.
+\end{itemize}
+\end{exbox}
+
+\begin{warnbox}
+(1) With a single ``or'' between \emph{overlapping} possibilities, adding double-counts (that is Chapter 2's inclusion--exclusion). (2) Multiply only when the number of options at later stages does not depend on \emph{which} earlier option was chosen (or when it depends only on \emph{how many} were used, like without-replacement counts).
+\end{warnbox}
+
+%---------------------------------------------------------------------
+\subsection{Permutations (Sec.\ 1.3)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+A \textbf{permutation} is an \emph{ordered} arrangement. To line up $n$ different people: $n$ choices for the first spot, $n-1$ for the second, \dots, 1 for the last: $n!$. To line up only $r$ of the $n$ people (say the top 3 finishers out of 10 runners): $n(n-1)\cdots(n-r+1)$.
+\end{ideabox}
+
+\begin{defbox}[Factorial and permutation]
+A \textbf{permutation} is an \emph{ordered} arrangement (or ordered selection) of objects.
+\begin{itemize}
+\item Orderings of $n$ distinguishable objects: $n!$.
+\item Ordered selections of $r$ objects from $n$ distinguishable objects (without replacement):
+\[ {}_nP_r=\frac{n!}{(n-r)!}=n(n-1)\cdots(n-r+1)\qquad(r\text{ factors}).\]
+Note ${}_nP_n=n!/0!=n!$.
+\item \textbf{With replacement} (each position independently chooses among all $n$): $n^r$.
+\end{itemize}
+\end{defbox}
+
+\begin{thmbox}[Permutations of $n$ objects, some indistinguishable]
+Suppose $n_1$ of the objects are alike, $n_2$ are alike, \dots, $n_r$ are alike ($n_1+\cdots+n_r=n$). The number of distinct arrangements is
+\[ \frac{n!}{n_1!\,n_2!\cdots n_r!}. \]
+\textbf{Why:} if all $n$ objects were distinguishable there would be $n!$ orderings. Each \emph{pattern} is counted $n_1!\,n_2!\cdots n_r!$ times (the ways to shuffle the alike objects among themselves without changing the pattern), so divide.
+\end{thmbox}
+
+\begin{methodbox}[Handling restrictions in arrangements]
+\begin{itemize}
+\item \textbf{Must be adjacent:} glue them into one block, arrange the blocks, then multiply by the ways to arrange inside the block (e.g.\ $A,B$ adjacent: $5!\cdot2!$ for 6 objects).
+\item \textbf{Same type together:} arrange the types as blocks, then arrange within each block.
+\item \textbf{Cannot be adjacent:} \emph{total} $-$ \emph{adjacent}.
+\item \textbf{$A$ before $B$} (no other condition): by symmetry exactly half of all orderings, $n!/2$. ($A$ before $B$ before $C$: $n!/3!$.)
+\item \textbf{Some positions forced:} fill the forced positions first, then arrange the rest.
+\end{itemize}
+\end{methodbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(Ross Ex.\ 3a)} Batting orders of a baseball team with 9 players: $9!=362{,}880$.
+\item \textbf{(Ross Ex.\ 3b)} A class has 6 men and 4 women, ranked by exam score, no ties: $10!=3{,}628{,}800$ possible rankings. If the men are ranked among themselves and the women among themselves (two separate lists): $6!\,4!=17{,}280$.
+\item \textbf{(Ross Ex.\ 3c)} 10 books on a shelf: 4 mathematics, 3 chemistry, 2 history, 1 language; same subject must stay together. Order the 4 subject blocks: $4!$. Then order inside each: $4!\,3!\,2!\,1!$. Total $4!\cdot(4!\,3!\,2!\,1!)=6912$.
+\item \textbf{(Ross Ex.\ 3d)} Arrangements of the letters of PEPPER: 6 letters, with P$\times3$, E$\times2$, R$\times1$: $\dfrac{6!}{3!\,2!\,1!}=60$. \textbf{(lecture)} MISSISSIPPI: 11 letters, M$\times1$, I$\times4$, S$\times4$, P$\times2$: $\dfrac{11!}{1!\,4!\,4!\,2!}=34{,}650$.
+\item \textbf{(Ross Ex.\ 3e)} A chess tournament has 10 players: 4 Russians, 3 from the U.S., 2 British, 1 Brazilian. If the final standing lists only nationalities, the number of possible lists is $\dfrac{10!}{4!\,3!\,2!\,1!}=12{,}600$ (a list is an arrangement of the multiset R,R,R,R,U,U,U,B,B,Z).
+\item \textbf{(Ross Ex.\ 3f)} Signals from 9 flags hung in a line using 4 identical white, 3 identical red, 2 identical blue flags: $\dfrac{9!}{4!\,3!\,2!}=1260$.
+\item \textbf{(lecture)} A photo of 4 of 10 people in a line: ${}_{10}P_4=10\cdot9\cdot8\cdot7=5040$. \textbf{(Review \#3)} 12 blocks (4 red, 6 black, 1 white, 1 blue) in a line: $\dfrac{12!}{4!\,6!\,1!\,1!}=27{,}720$.
+\item \textbf{(extra)} Letters of BANANA: B$\times1$, A$\times3$, N$\times2$: $\dfrac{6!}{1!\,3!\,2!}=60$.
+\item \textbf{(extra)} 5 people in a row, 2 of them (say Ann and Bob) refuse to be adjacent: total $5!=120$; adjacent: $4!\cdot2=48$; answer $120-48=72$.
+\item \textbf{(extra)} 3-letter ``words'' (any letters allowed, with repetition) from A--E: $5^3=125$. Without repetition: ${}_5P_3=5\cdot4\cdot3=60$.
+\end{itemize}
+\end{exbox}
+
+\begin{warnbox}
+Don't confuse ${}_nP_r$ (select \emph{and order}) with $\binom nr$ (select only). If the problem says ``arranged'', ``ranked'', ``in a line'', ``in order'', ``president, treasurer, secretary (different jobs)'' it is a permutation. If it says ``committee'', ``group'', ``hand'', ``subset'', it is a combination.
+\end{warnbox}
+
+%---------------------------------------------------------------------
+\subsection{Combinations (Sec.\ 1.4)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+A \textbf{combination} is a \emph{unordered} selection---just a subset. To pick a committee of 3 from 20 people, first imagine picking an ordered list: ${}_{20}P_3$. But each committee $\{x,y,z\}$ shows up $3!=6$ times in that list (all the orderings of the same three people). So divide by $3!$.
+\end{ideabox}
+
+\begin{defbox}[Combination / binomial coefficient]
+The number of subsets of size $r$ of an $n$-element set (``$n$ choose $r$'') is
+\[ \binom nr={}_nC_r=\frac{n!}{(n-r)!\,r!}=\frac{{}_nP_r}{r!}=\frac{n(n-1)\cdots(n-r+1)}{r!}. \]
+\textbf{Conventions:} $\binom nr=0$ if $r<0$ or $r>n$. $\binom n0=\binom nn=1$ (one empty subset; one full subset).\\
+\textbf{Symmetry:} $\binom nr=\binom n{n-r}$ (choosing which $r$ to take is the same as choosing which $n-r$ to leave out).
+\end{defbox}
+
+\begin{thmbox}[Pascal's identity (Ross eq.\ 4.1)]
+\[ \binom nr=\binom{n-1}{r-1}+\binom{n-1}{r},\qquad 1\le r\le n. \]
+\textbf{Combinatorial proof:} fix one particular object (object 1). A group of $r$ either contains object 1---then choose the other $r-1$ from the remaining $n-1$: $\binom{n-1}{r-1}$---or does not---then choose all $r$ from the other $n-1$: $\binom{n-1}{r}$. These cases are mutually exclusive and exhaustive. (Example: $\binom52=\binom41+\binom42=4+6=10$.)
+\end{thmbox}
+
+\begin{methodbox}[Combination problems]
+\begin{itemize}
+\item \textbf{Several groups chosen separately} (``2 women \emph{and} 3 men''): multiply the combinations, $\binom52\binom73$.
+\item \textbf{``At least''}: either add the cases ($k=3,4,5,\dots$) or take the complement (total $-$ none).
+\item \textbf{Two people can't serve together:} total $-$ (committees containing both). Count those containing both by ``fix the pair, choose the rest''.
+\item \textbf{A person must serve:} fix them in, choose the rest.
+\item Choose \emph{what}, then \emph{how to arrange} only if order is asked.
+\end{itemize}
+\end{methodbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(Ross Ex.\ 4a)} A committee of 3 from 20 people: $\binom{20}3=\dfrac{20\cdot19\cdot18}{3\cdot2\cdot1}=1140$. \textbf{(lecture)} 3 from 9: $\binom93=84$.
+\item \textbf{(Ross Ex.\ 4b / lecture)} 5 women and 7 men; a committee of 2 women and 3 men: $\binom52\binom73=10\cdot35=350$. \emph{If two of the men are feuding and refuse to serve together:} the committees that contain \emph{both} feuders consist of the pair plus 1 more man (from the 5 other men) and 2 women: $\binom52\cdot\binom51$. So the number of acceptable committees is
+\[ \binom52\left[\binom73-\binom51\right]=10\,(35-5)=300. \]
+\item \textbf{(Ross Ex.\ 4c)} $n$ antennas, $m$ of them defective (identical), $n-m$ working, no two defective adjacent. Line up the $n-m$ working ones; the defectives must go into \emph{different} gaps among the $n-m+1$ gaps (including the two ends): $\binom{n-m+1}{m}$. (Check: $n=4,m=2$: $\binom32=3$ \checkmark.)
+\item \textbf{(Ross Ex.\ 4e)} The number of subsets of an $n$-element set is $\sum_{k=0}^n\binom nk=2^n$ (each element is in or out: $2\cdot2\cdots2$). Non-empty subsets: $2^n-1$.
+\item \textbf{(extra)} 5-card hand from a 52-card deck: $\binom{52}5=2{,}598{,}960$ hands. Exactly 2 aces: $\binom42\binom{48}3=6\cdot17{,}296=103{,}776$ (choose which 2 of the 4 aces; choose 3 non-aces from 48).
+\item \textbf{(extra, complement)} A committee of 4 from 6 men and 5 women with at least 1 woman: all $\binom{11}4=330$ minus all-men $\binom64=15$: $315$.
+\end{itemize}
+\end{exbox}
+
+\begin{defbox}[Choosing the right counting tool]
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+& \textbf{without replacement} & \textbf{with replacement}\\
+\midrule
+\textbf{order matters} & ${}_nP_r=\dfrac{n!}{(n-r)!}$ & $n^r$\\
+\textbf{order doesn't matter} & $\dbinom nr$ & (not needed here)\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{defbox}
+
+%---------------------------------------------------------------------
+\subsection{The Binomial Theorem (Sec.\ 1.4)}
+%---------------------------------------------------------------------
+
+\begin{thmbox}[Binomial Theorem (Ross eq.\ 4.2)]
+\[ (x+y)^n=\sum_{k=0}^n\binom nk x^k y^{n-k}. \]
+\end{thmbox}
+
+\begin{ideabox}
+Expand $(x+y)^n=(x+y)(x+y)\cdots(x+y)$ ($n$ factors). Each term of the expansion comes from picking either $x$ or $y$ from each factor. The terms with exactly $k$ $x$'s (hence $n-k$ $y$'s) correspond to choosing \emph{which} $k$ of the $n$ factors give an $x$: $\binom nk$ ways. So the coefficient of $x^ky^{n-k}$ is $\binom nk$.
+\end{ideabox}
+
+\textbf{Proof (combinatorial).} $(x_1+y_1)\cdots(x_n+y_n)$ expands into $2^n$ terms, one for each choice of $x_i$ or $y_i$ from each factor; those with exactly $k$ $x$'s number $\binom nk$ (choose which $k$ factors). Set all $x_i=x,\;y_i=y$. (Ross also gives an induction proof using Pascal's identity; proof by induction is not tested.)
+
+\begin{exbox}[Examples and consequences]
+\begin{itemize}
+\item $(x+y)^3=y^3+3xy^2+3x^2y+x^3$, and $(x+y)^4=x^4+4x^3y+6x^2y^2+4xy^3+y^4$. The coefficients are the rows of \textbf{Pascal's triangle}: $1;\ 1\,1;\ 1\,2\,1;\ 1\,3\,3\,1;\ 1\,4\,6\,4\,1;\ 1\,5\,10\,10\,5\,1;\dots$ (each entry is the sum of the two above it---Pascal's identity!).
+\item Set $x=y=1$: $\sum_k\binom nk=2^n$. Set $x=1,y=-1$: $\sum_k(-1)^k\binom nk=0$ for $n\ge1$ (equal numbers of even-sized and odd-sized subsets).
+\item \textbf{(extra)} Coefficient of $x^3y^2$ in $(x+y)^5$: $\binom53=10$. Coefficient of $x^4$ in $(2x+3)^6$: take $x\to2x$, $y\to3$: $\binom64\,2^4\,3^2=15\cdot16\cdot9=2160$.
+\end{itemize}
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Partitions and Multinomial Coefficients (Sec.\ 1.5)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+How many ways can you split $n$ different people into \emph{labelled} groups of given sizes (``a team of 5 for patrol, 2 at the station, 3 in reserve'')? Choose the first group, then the second from whoever is left, etc. The factorials telescope into one clean formula. It is the same number as the arrangements of a word with repeated letters---the ``letters'' are the group labels, the ``slots'' are the people.
+\end{ideabox}
+
+\begin{defbox}[Partition and multinomial coefficient]
+Let $A$ be a set of $n$ distinct objects and let $n_1,\dots,n_r$ be nonnegative integers with $n_1+\cdots+n_r=n$. A distribution of the $n$ objects into (distinguishable) groups of sizes $n_1,\dots,n_r$ is a \textbf{partition} of $A$. The number of partitions is the \textbf{multinomial coefficient}
+\[ \binom{n}{n_1,n_2,\dots,n_r}=\frac{n!}{n_1!\,n_2!\cdots n_r!}. \]
+A combination is the special case $r=2$.
+\end{defbox}
+
+\textbf{Proof.} Choose group 1: $\binom n{n_1}$ ways; then group 2 from the people left: $\binom{n-n_1}{n_2}$; and so on. The count is
+\[ \binom n{n_1}\binom{n-n_1}{n_2}\cdots\binom{n-n_1-\cdots-n_{r-1}}{n_r}
+=\frac{n!}{n_1!\,(n-n_1)!}\cdot\frac{(n-n_1)!}{n_2!\,(n-n_1-n_2)!}\cdots=\frac{n!}{n_1!\,n_2!\cdots n_r!}, \]
+because the factorials telescope.
+
+\begin{thmbox}[Multinomial theorem]
+\[ (x_1+x_2+\cdots+x_r)^n=\sum_{n_1+\cdots+n_r=n}\binom{n}{n_1,\dots,n_r}x_1^{n_1}x_2^{n_2}\cdots x_r^{n_r}. \]
+Example: $(x_1+x_2+x_3)^2=x_1^2+x_2^2+x_3^2+2x_1x_2+2x_1x_3+2x_2x_3$. (Coefficient of $x_1x_2$ is $\frac{2!}{1!1!0!}=2$.)
+\end{thmbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(lecture)} 9 people divided into committees of sizes 2, 3, 4: $\dfrac{9!}{2!\,3!\,4!}=1260$.
+\item \textbf{(Ross Ex.\ 5a)} 10 police officers: 5 on patrol, 2 at the station, 3 in reserve: $\dfrac{10!}{5!\,2!\,3!}=2520$.
+\item \textbf{(Ross Ex.\ 5b)} 10 children divided into an A team and a B team of 5 each (labelled teams): $\dfrac{10!}{5!\,5!}=252$.
+\item \textbf{(Ross Ex.\ 5c)} 10 children split into two teams of 5 with no labels (only the split matters): $\dfrac{10!/(5!\,5!)}{2!}=126$ (each unlabeled split appears twice in the labelled count).
+\item \textbf{(extra)} 7 gifts divided among 3 children: the eldest gets 3, the others 2 each: $\dfrac{7!}{3!\,2!\,2!}=210$.
+\item \textbf{(extra)} 6 people into 3 \emph{labelled} pairs: $\frac{6!}{2!2!2!}=90$. Into 3 \emph{unlabeled} pairs: $90/3!=15$.
+\item \textbf{(extra)} Coefficient of $x_1x_2x_3$ in $(x_1+x_2+x_3)^3$: $\frac{3!}{1!1!1!}=6$; coefficient of $x_1^2x_2$: $\frac{3!}{2!1!0!}=3$.
+\end{itemize}
+\end{exbox}
+
+\begin{warnbox}
+\textbf{Labelled groups} (an A team and a B team; different jobs) $\Rightarrow$ the plain multinomial. \textbf{Unlabeled groups of equal size} $\Rightarrow$ divide by the number of ways to reorder the equal-size groups ($2!$ above). Sec.~1.6 (integer solutions of $x_1+\cdots+x_r=n$, ``stars and bars'') is \textbf{not tested}.
+\end{warnbox}
+
+%---------------------------------------------------------------------
+\subsection{Chapter 1 recap: which tool?}
+%---------------------------------------------------------------------
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.3in}>{\raggedright\arraybackslash}p{2.9in}@{}}
+\toprule
+\textbf{Question looks like\dots} & \textbf{Use}\\
+\midrule
+Several independent choices in sequence (slots of a plate, outfits) & multiply: $n_1n_2\cdots n_r$\\
+Line up / rank / assign distinct jobs & permutation $n!$, ${}_nP_r$\\
+Rearrange letters with repeats; ``lists of nationalities''; flags of identical colors & $\dfrac{n!}{n_1!\cdots n_r!}$\\
+Choose a committee/hand/subset & $\binom nr$\\
+Split into labelled groups of given sizes & $\dfrac{n!}{n_1!\cdots n_r!}$\\
+Split into unlabeled equal groups & divide by (number of groups)$!$\\
+``At least one'' / forbidden pairs & subtract the complement\\
+Expand $(x+y)^n$, find a coefficient & binomial / multinomial theorem\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\clearpage
+%=====================================================================
+\section{Chapter 2 -- Axioms of Probability}\label{sec:ch2}
+%=====================================================================
+
+%---------------------------------------------------------------------
+\subsection{Sample Space and Events (Sec.\ 2.2)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+Before you can talk about probabilities you must say \emph{exactly what could happen}. The \textbf{sample space} is that list (set) of all possible outcomes. An \textbf{event} is any collection of outcomes you might care about (``the sum is 7'', ``at least one head''). Because events are sets, all of set language applies. An event \emph{occurs} when the actual outcome is one of its members.
+\end{ideabox}
+
+\begin{defbox}[Sample space, event]
+The \textbf{sample space} $S$ of an experiment is the set of all possible outcomes. An \textbf{event} is a subset $E\subseteq S$. We say $E$ \textbf{occurs} if the outcome of the experiment lies in $E$. The \textbf{union} $\bigcup_{i=1}^nE_i$ is the event that \emph{at least one} $E_i$ occurs; the \textbf{intersection} $\bigcap_{i=1}^nE_i$ is the event that \emph{all} occur. If $E\subseteq F$, the occurrence of $E$ implies the occurrence of $F$.
+\end{defbox}
+
+\begin{defbox}[Mutually exclusive]
+Events $A$ and $B$ are \textbf{mutually exclusive} (disjoint) if $A\cap B=\emptyset$: no outcome lies in both, so they cannot both occur. Events $E_1,E_2,\dots$ are mutually exclusive if every pair is: $E_iE_j=\emptyset$ for $i\ne j$.
+\end{defbox}
+
+\begin{exbox}[Sample spaces (Ross Sec.\ 2.2)]
+\begin{itemize}
+\item Sex of a newborn: $S=\{g,b\}$.
+\item Order of finish in a race of 7 horses: $S=$ all $7!=5040$ permutations of $(1,\dots,7)$.
+\item Flip two coins: $S=\{(h,h),(h,t),(t,h),(t,t)\}$ (4 outcomes; order matters: $(h,t)\ne(t,h)$).
+\item Roll two dice: $S=\{(i,j):1\le i,j\le6\}$ (36 outcomes; $(1,6)\ne(6,1)$ because the dice are distinguishable: first/second).
+\item Lifetime of a transistor in hours: $S=\{x:0\le x<\infty\}$ (an infinite, continuous sample space).
+\item \textbf{Events:} ``at least one head'' $=\{(h,h),(h,t),(t,h)\}$. ``Sum of two dice is 7'' $=\{(1,6),(2,5),(3,4),(4,3),(5,2),(6,1)\}$. Every outcome of the 36 is a \emph{sample point}; the sum 7 is an \emph{event} containing 6 of them.
+\item \textbf{Mutually exclusive:} for two dice, ``sum is 7'' and ``sum is 6'' are mutually exclusive; ``sum is 7'' and ``first die is 4'' are not (both contain $(4,3)$).
+\end{itemize}
+\end{exbox}
+
+\begin{thmbox}[Set laws]
+\textbf{De Morgan's laws:}
+$\displaystyle\Big(\bigcup_iE_i\Big)^c=\bigcap_iE_i^c,\qquad\Big(\bigcap_iE_i\Big)^c=\bigcup_iE_i^c$; for two events $(A\cup B)^c=A^cB^c$ and $(AB)^c=A^c\cup B^c$.\\
+\textbf{Commutative:} $E\cup F=F\cup E$, $EF=FE$. \textbf{Associative:} $(E\cup F)\cup G=E\cup(F\cup G)$, $(EF)G=E(FG)$.\\
+\textbf{Distributive:} $(E\cup F)G=EG\cup FG$ and $(EF)\cup G=(E\cup G)(F\cup G)$.\\
+(Note $(E\cup F)\cap G\ne E\cup(F\cap G)$ in general: parentheses matter.)\\
+Verify any identity with a Venn diagram: an outcome is in the left side iff it is in the right.
+\end{thmbox}
+
+\begin{exbox}[Checking De Morgan on a die]
+$S=\{1,\dots,6\}$, $E=\{2,4,6\}$, $F=\{1,2,3\}$. Then $E\cup F=\{1,2,3,4,6\}$, so $(E\cup F)^c=\{5\}$; and $E^c=\{1,3,5\}$, $F^c=\{4,5,6\}$, $E^cF^c=\{5\}$ \checkmark. Also $EF=\{2\}$, $(EF)^c=\{1,3,4,5,6\}=E^c\cup F^c=\{1,3,5\}\cup\{4,5,6\}$ \checkmark.
+\end{exbox}
+
+\begin{methodbox}[Describing events in words (practice)]
+Let $A,B,C$ be events. In words: \emph{only $A$} $=AB^cC^c$. \emph{At least one} $=A\cup B\cup C$. \emph{None} $=A^cB^cC^c=(A\cup B\cup C)^c$. \emph{Exactly one} $=AB^cC^c\cup A^cBC^c\cup A^cB^cC$. \emph{At least two} $=AB\cup AC\cup BC$. \emph{All three} $=ABC$. \emph{$A$ happens but not both $B$ and $C$} $=A(BC)^c$.
+\end{methodbox}
+
+%---------------------------------------------------------------------
+\subsection{Axioms of Probability (Sec.\ 2.3)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+You can think of probability as ``how much of the total stuff (total mass 1) sits on this event.'' The three axioms say: no negative or oversized mass, the whole sample space has mass exactly 1, and the masses of non-overlapping events simply add. \emph{Everything else in probability follows from these three statements.}
+\end{ideabox}
+
+\begin{defbox}[The three axioms of probability]
+A \textbf{probability} $P$ assigns to each event $E$ of the sample space $S$ a number $P(E)$ such that
+\begin{enumerate}
+\item $0\le P(E)\le1$;
+\item $P(S)=1$;
+\item for any sequence of mutually exclusive events $E_1,E_2,\dots$: $\;P\!\left(\bigcup_{i=1}^\infty E_i\right)=\sum_{i=1}^\infty P(E_i)$.
+\end{enumerate}
+\end{defbox}
+
+\textbf{Interpretations.} The \emph{relative-frequency} view says $P(E)=\lim_{n\to\infty}n(E)/n$ (the fraction of $n$ repetitions in which $E$ occurs). Its drawback: it \emph{assumes} that the limit exists. The axiomatic approach avoids this (and the strong law of large numbers shows that the relative frequency does converge to $P(E)$, with probability 1).
+
+\begin{thmbox}[First consequences]
+\begin{itemize}
+\item $P(\emptyset)=0$. Proof: take $E_1=S$, $E_i=\emptyset$ for $i>1$ in Axiom 3: $P(S)=P(S)+\sum_{i>1}P(\emptyset)$, which forces $P(\emptyset)=0$.
+\item \textbf{Finite additivity:} for mutually exclusive $E_1,\dots,E_n$, $P\!\left(\bigcup_{i=1}^nE_i\right)=\sum_{i=1}^nP(E_i)$ (pad with empty sets).
+\item For a finite $S$, $P(E)=\sum_{\text{outcomes }s\in E}P(\{s\})$: add up the probabilities of the outcomes in $E$.
+\end{itemize}
+\end{thmbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(lecture)} Fair coin: $H$ and $T$ are mutually exclusive and exhaustive, $P(H)=P(T)$, so $1=P(S)=P(H)+P(T)=2P(H)$, hence $P(H)=\tfrac12$.
+\item \textbf{(Ross Ex.\ 3a)} A biased coin for which heads is twice as likely as tails: $P(H)=2P(T)$ and $P(H)+P(T)=1$ give $P(T)=\tfrac13$, $P(H)=\tfrac23$.
+\item \textbf{(Ross Ex.\ 3b)} Fair die: $P(\text{even})=P(2)+P(4)+P(6)=\tfrac16+\tfrac16+\tfrac16=\tfrac12$ by Axiom 3.
+\item \textbf{(extra)} A loaded die with $P(i)=ci$ for $i=1,\dots,6$: $c(1+2+\cdots+6)=1\Rightarrow c=\tfrac1{21}$; $P(\text{even})=\tfrac{2+4+6}{21}=\tfrac{12}{21}=\tfrac47$.
+\end{itemize}
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Some Simple Propositions (Sec.\ 2.4)}
+%---------------------------------------------------------------------
+
+\begin{thmbox}[Propositions 4.1--4.4 (with proofs)]
+\begin{enumerate}
+\item \textbf{Complement rule:} $P(E^c)=1-P(E)$.\\
+\emph{Proof:} $E$ and $E^c$ are mutually exclusive with union $S$, so $1=P(S)=P(E)+P(E^c)$.
+\item \textbf{Monotonicity:} if $E\subseteq F$ then $P(E)\le P(F)$.\\
+\emph{Proof:} $F=E\cup E^cF$ (disjoint), so $P(F)=P(E)+P(E^cF)\ge P(E)$.
+\item \textbf{Union of two events:} $P(E\cup F)=P(E)+P(F)-P(EF)$.\\
+\emph{Proof:} $E\cup F=E\cup E^cF$ (disjoint) and $F=EF\cup E^cF$ (disjoint) so $P(E^cF)=P(F)-P(EF)$. Add.
+\item \textbf{Inclusion--exclusion for three events:}
+\begin{align*}
+P(E\cup F\cup G)&=P(E)+P(F)+P(G)\\
+&\quad-P(EF)-P(EG)-P(FG)+P(EFG).
+\end{align*}
+\item \textbf{Inclusion--exclusion (general):}
+\begin{align*}
+P\Big(\bigcup_{i=1}^nE_i\Big)&=\sum_iP(E_i)-\sum_{i_1<i_2}P(E_{i_1}E_{i_2})+\cdots\\
+&\quad+(-1)^{r+1}\!\!\sum_{i_1<\cdots<i_r}\!\!P(E_{i_1}\cdots E_{i_r})+\cdots+(-1)^{n+1}P(E_1\cdots E_n).
+\end{align*}
+\item \textbf{Boole's inequality:} $P\big(\bigcup_iE_i\big)\le\sum_iP(E_i)$. (Truncating the inclusion--exclusion sum after 1, 2, 3, \dots\ terms gives alternately an upper, lower, upper, \dots\ bound.)
+\end{enumerate}
+\end{thmbox}
+
+\begin{ideabox}[Why inclusion--exclusion works]
+Adding $P(E)+P(F)$ counts the overlap $EF$ twice, so subtract it once. With three sets: adding the three singles counts each pairwise overlap twice (subtract them once each) but then the triple overlap, counted 3 times in the singles and removed 3 times in the pairs, is gone entirely---add it back once. \textbf{Signs alternate $+,-,+,\dots$.} The same formula holds with $N(\cdot)$ (counts) in place of $P(\cdot)$.
+\end{ideabox}
+
+\begin{methodbox}[Venn-box / Venn-diagram method for 2 or 3 events]
+\textbf{Two events:} fill the $2\times2$ table (every row and column adds up to its total).
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}c|c|c|c@{}}
+ & $A$ & $A^c$ & \\\hline
+$B$ & $P(A\cap B)$ & $P(A^cB)$ & $P(B)$\\\hline
+$B^c$ & $P(AB^c)$ & $P(A^cB^c)$ & $P(B^c)$\\\hline
+ & $P(A)$ & $P(A^c)$ & $1$
+\end{tabular}
+\end{center}
+\textbf{Three events:} draw three overlapping circles and \textbf{fill in from the middle outward}: (1) the triple overlap $P(ABC)$; (2) each pairwise-only region = pair total $-$ triple; (3) each only-one region = single total $-$ (the two adjacent pairwise-only regions) $-$ triple; (4) outside = $1-$ (everything inside). Then any event is a sum of regions.
+\end{methodbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(Ross Ex.\ 4a)} Jane is taking two books on a trip. $P(\text{likes }B_1)=.5$, $P(\text{likes }B_2)=.4$, $P(\text{both})=.3$. Then $P(B_1\cup B_2)=.5+.4-.3=.6$, so $P(\text{likes neither})=1-.6=.4$. Venn regions: only $B_1=.5-.3=.2$; both $=.3$; only $B_2=.4-.3=.1$; neither $=.4$ (total $=1$ \checkmark).
+\item \textbf{(extra; same type as Self-Test 2.2)} A shopper buys a suit w.p.\ $.22$, a shirt $.30$, a tie $.28$; suit\&shirt $.11$, suit\&tie $.14$, shirt\&tie $.10$; all three $.06$.\\
+$P(\text{at least one})=.22+.30+.28-.11-.14-.10+.06=.51$, so $P(\text{none})=.49$.\\
+Venn regions from the middle: all three $.06$; suit\&shirt only $.11-.06=.05$; suit\&tie only $.14-.06=.08$; shirt\&tie only $.10-.06=.04$; suit only $.22-.05-.08-.06=.03$; shirt only $.30-.05-.04-.06=.15$; tie only $.28-.08-.04-.06=.10$. $P(\text{exactly one})=.03+.15+.10=.28$. (Full solution in Sec.~\ref{sec:selftest}.)
+\item \textbf{(extra)} $P(A)=.6$, $P(B)=.5$. What are the largest and smallest possible values of $P(AB)$? $P(AB)\le\min(P(A),P(B))=.5$; and $P(A\cup B)\le1$ gives $P(AB)\ge.6+.5-1=.1$. So $.1\le P(AB)\le.5$.
+\end{itemize}
+\end{exbox}
+
+\begin{warnbox}
+Inclusion--exclusion with \emph{counts} (Review \#6): if every client has at least one policy, $N(A\cup B)=N(A)+N(B)-N(AB)$ with $N(A\cup B)=82$ gives $N(AB)=62+37-82=17$. Do not forget the ``every client has at least one'' assumption: it is what makes the union the whole set.
+\end{warnbox}
+
+%---------------------------------------------------------------------
+\subsection{Sample Spaces with Equally Likely Outcomes (Sec.\ 2.5)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+When \emph{every outcome is equally likely}, probability is just counting: the fraction of outcomes that are in your event. The hard part is (i) \textbf{checking} that the outcomes you are counting really are equally likely, and (ii) \textbf{counting} numerator and denominator \emph{in the same way}. (The 36 ordered pairs for two dice are equally likely; the 11 possible \emph{sums} are not.)
+\end{ideabox}
+
+\begin{defbox}[Classical probability]
+If $S=\{1,\dots,N\}$ is finite and all outcomes are equally likely, then $P(\{i\})=\dfrac1N$ for each $i$ and for any event $E$,
+\[ P(E)=\frac{\text{number of outcomes in }E}{\text{number of outcomes in }S}=\frac{N(E)}{N(S)}. \]
+\textbf{Classical} probability = a \emph{discrete} sample space with \emph{equally likely} outcomes. Anything else (continuous $S$, unequal probabilities) is ``modern'' probability.
+\end{defbox}
+
+\begin{warnbox}
+Rolling two dice: the sums $2,\dots,12$ are \textbf{not} equally likely, so $P(\text{sum}=8)\ne\tfrac1{11}$. A sum is an \emph{event}, not an outcome. Use the 36 equally likely ordered pairs: $P(\text{sum}=8)=\tfrac5{36}$ (the pairs $(2,6),(3,5),(4,4),(5,3),(6,2)$).
+\end{warnbox}
+
+\textbf{Order doesn't matter for the answer.} When you draw $k$ items at random you may treat the outcome as an ordered selection (sequence) or an unordered set. If all outcomes are equally likely in one view then they are in the other (each set corresponds to exactly $k!$ sequences), so you get the same probability. Choose whichever is easier, but \textbf{count the numerator and denominator the same way}.
+
+\begin{methodbox}[Setting up an equally-likely problem]
+\begin{enumerate}
+\item Decide the experiment (e.g.\ ``deal 5 cards'', ``roll 2 dice'', ``draw 3 balls'').
+\item Decide ordered or unordered and compute $N(S)$ (e.g.\ $\binom{52}5$ or $52\cdot51\cdot50\cdot49\cdot48$).
+\item Compute $N(E)$ in the \emph{same} ordered/unordered view, with the tools of Ch.~1 (multiply independent choices; add disjoint cases).
+\item Divide. Simplify. Sanity-check $0\le P\le1$.
+\end{enumerate}
+\end{methodbox}
+
+\begin{exbox}[Examples from Ross Sec.\ 2.5]
+\begin{itemize}
+\item \textbf{(Ex.\ 5a)} Two dice, sum 7: $\tfrac6{36}=\tfrac16$.
+\item \textbf{(Ex.\ 5b)} 3 balls drawn from a bowl with 6 white and 5 black; exactly 1 white and 2 black. \emph{Ordered:} the white ball can come in any of 3 positions: $\dfrac{3\cdot(6\cdot5\cdot4)}{11\cdot10\cdot9}=\dfrac{360}{990}=\dfrac4{11}$. \emph{Unordered:} $\dfrac{\binom61\binom52}{\binom{11}3}=\dfrac{60}{165}=\dfrac4{11}$. Same answer, as promised.
+\item \textbf{(Ex.\ 5c)} A committee of 5 from 6 men and 9 women, exactly 3 men and 2 women: $\dfrac{\binom63\binom92}{\binom{15}5}=\dfrac{20\cdot36}{3003}=\dfrac{240}{1001}$.
+\item \textbf{(Ex.\ 5d)} $n$ balls, one of them special; $k$ balls drawn at random. $P(\text{special ball is drawn})=\dfrac{\binom{n-1}{k-1}}{\binom nk}=\dfrac kn$.
+\item \textbf{(Ex.\ 5f)} Poker \emph{straight} (5 consecutive values, not all one suit): $\dfrac{10\,(4^5-4)}{\binom{52}5}=\dfrac{10{,}200}{2{,}598{,}960}\approx.0039$. (10 possible lowest values; each card can be any of 4 suits; subtract the 4 straight flushes.)
+\item \textbf{(Ex.\ 5g)} Poker \emph{full house} (three of one value, two of another): $\dfrac{13\cdot\binom43\cdot12\cdot\binom42}{\binom{52}5}=\dfrac{3744}{2{,}598{,}960}\approx.0014$.
+\item \textbf{(Ex.\ 5h)} Bridge: 52 cards dealt 13 each to 4 players. $P(\text{some player gets all 13 spades})=4\big/\binom{52}{13}\approx6.3\times10^{-12}$ (4 choices of player; $\binom{52}{13}$ equally likely hands for that player). $P(\text{each player gets exactly one ace})=\dfrac{4!\,\dfrac{48!}{12!\,12!\,12!\,12!}}{\dfrac{52!}{13!\,13!\,13!\,13!}}\approx.1055$ (assign the 4 aces to the 4 players in $4!$ ways, deal the 48 non-aces 12 each).
+\item \textbf{(Ex.\ 5j)} A shuffled deck, cards turned up until the first ace. Each of the 52 cards is equally likely (prob.\ $\tfrac1{52}$) to be the card immediately after the first ace: the ace of spades is no more likely than the two of clubs.
+\item \textbf{(extra)} 3 coin flips: exactly 2 heads $=\tfrac38$ (outcomes $hht,hth,thh$ out of 8); at least one head $=1-\tfrac18=\tfrac78$.
+\item \textbf{(extra)} Two cards from a deck, both hearts: $\dfrac{\binom{13}2}{\binom{52}2}=\dfrac{78}{1326}=\dfrac1{17}$ (or $\tfrac{13}{52}\cdot\tfrac{12}{51}$).
+\item \textbf{(extra)} Two dice show the same number: $\tfrac6{36}=\tfrac16$; their sum is at least 10: $(4,6),(5,5),(6,4),(5,6),(6,5),(6,6)$: $\tfrac6{36}=\tfrac16$.
+\end{itemize}
+\end{exbox}
+
+\begin{exbox}[Birthday problem (Ross Ex.\ 5i; lecture)]
+$n$ people; ignore leap years; assume all $365^n$ assignments of birthdays are equally likely. Then
+\[ P(\text{no two share a birthday})=\frac{365\cdot364\cdots(365-n+1)}{365^n}=\frac{{}_{365}P_n}{365^n}. \]
+\textbf{Reasoning:} person 1 can have any birthday; person 2 must avoid 1 date: $364/365$; person 3 must avoid 2 dates; \dots\\
+For $n=25$: $P(\text{at least two share})=1-\dfrac{{}_{365}P_{25}}{365^{25}}\approx.569$. (lecture) $P(\text{exactly one pair shares and nobody else})=\dfrac{\binom{25}2\cdot{}_{365}P_{24}}{365^{25}}\approx.379$ (glue the pair into one ``person'': choose which 2 of the 25 form the pair, then give the 24 ``people'' distinct birthdays).\\
+\textbf{The surprise:} with just $n=23$ people $P(\text{match})\approx.507>\tfrac12$ (with $n=50$ it is $\approx.970$). Reason: there are $\binom{23}2=253$ pairs of people, and each pair has a $\tfrac1{365}$ chance of matching.
+\end{exbox}
+
+\begin{exbox}[Club problem (Ross Ex.\ 5l; lecture variation)]
+A club of 60 members: 36 play tennis ($T$), 28 squash ($S$), 18 badminton ($B$); 22 play $T\&S$, 12 play $T\&B$, 9 play $S\&B$; 4 play all three.\\
+\textbf{At least one sport:} $N(T\cup S\cup B)=36+28+18-22-12-9+4=43$; so 17 play none.\\
+\textbf{Venn regions (middle outward):} all three $=4$; $TS$ only $=22-4=18$; $TB$ only $=12-4=8$; $SB$ only $=9-4=5$; $T$ only $=36-18-8-4=6$; $S$ only $=28-18-5-4=1$; $B$ only $=18-8-5-4=1$; none $=60-43=17$. (Check: $6+1+1+18+8+5+4+17=60$ \checkmark.)\\
+A random member: $P((T\cup B)\cap S^c)=\dfrac{6+8+1}{60}=\dfrac14$ (regions in $T$ or $B$ but not in $S$: $T$-only, $TB$-only, $B$-only). $P(T\cup(B\cap S^c))=\dfrac{36+1}{60}=\dfrac{37}{60}$ (all 36 tennis players plus the 1 who is $B$-only; $TB$-only members are already in $T$).
+\end{exbox}
+
+\begin{exbox}[The matching problem (Ross Ex.\ 5m)]
+$N$ men throw their hats into a pile; each man then takes a hat at random. Let $E_i=$ ``man $i$ gets his own hat''. $P(E_{i_1}\cdots E_{i_n})=\dfrac{(N-n)!}{N!}$ (the $n$ named men get their own hats; the other $N-n$ hats are arranged arbitrarily) and there are $\binom Nn$ such terms, so each inclusion--exclusion term equals $\binom Nn\frac{(N-n)!}{N!}=\dfrac1{n!}$. Hence
+\[ P(\text{no matches})=1-P\Big(\bigcup E_i\Big)=\sum_{i=0}^N\frac{(-1)^i}{i!}\;\xrightarrow{N\to\infty}\;e^{-1}\approx.3679. \]
+A classic surprise: the probability of \emph{no} match does not tend to 0 or 1, and hardly depends on $N$ ($N=5$ already gives $.3667$).
+\end{exbox}
+
+\begin{warnbox}[Common mistakes in Chapter 2]
+\begin{itemize}
+\item Using $N(E)/N(S)$ when outcomes aren't equally likely (sums of dice; ``number of heads'').
+\item Counting the numerator ordered but the denominator unordered (or vice versa).
+\item Forgetting to subtract the overlap: $P(A\cup B)\ne P(A)+P(B)$ unless mutually exclusive.
+\item Confusing ``mutually exclusive'' with ``independent'' (they are essentially opposites; see Sec.~\ref{sec:indep}).
+\end{itemize}
+\end{warnbox}
+
+\clearpage
+%=====================================================================
+\section{Chapter 3 -- Conditional Probability and Independence}\label{sec:ch3}
+%=====================================================================
+
+%---------------------------------------------------------------------
+\subsection{Conditional Probability (Sec.\ 3.2)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+\textbf{Conditional probability = probability after you learn something.} If you are told that event $F$ has occurred, the universe \emph{shrinks} from $S$ to $F$ (the lecture phrase: ``Honey, I shrunk the universe''). The new probability of $E$ is the fraction of this smaller universe that lies in $E$: the part of $E$ inside $F$, i.e.\ $EF$, divided by the size of $F$. When all outcomes were equally likely, they stay equally likely inside $F$, so you can simply \emph{count inside $F$}.
+\end{ideabox}
+
+\begin{defbox}[Conditional probability]
+For events $E$ and $F$ with $P(F)>0$, the \textbf{conditional probability of $E$ given $F$} is
+\[ P(E\mid F)=\frac{P(EF)}{P(F)}. \]
+It agrees with the long-run-frequency interpretation: among the experiments in which $F$ occurs, the fraction in which $E$ also occurs.\\
+Conditional probabilities are probabilities: $0\le P(E\mid F)\le1$, $P(S\mid F)=1$, and e.g.\ $P(E^c\mid F)=1-P(E\mid F)$.
+\end{defbox}
+
+\begin{warnbox}
+$P(E\mid F)$ and $P(F\mid E)$ are \textbf{different numbers}. Example: $P(\text{a person is a mother}\mid\text{a woman})$ is not $P(\text{woman}\mid\text{mother})$ (the latter is 1). Reversing a conditional probability is exactly what Bayes' formula (next section) does. The event after the bar is the denominator.
+\end{warnbox}
+
+\begin{thmbox}[Multiplication rule]
+\[ P(EF)=P(F)\,P(E\mid F)=P(E)\,P(F\mid E), \]
+\[ P(E_1E_2E_3\cdots E_n)=P(E_1)\,P(E_2\mid E_1)\,P(E_3\mid E_1E_2)\cdots P(E_n\mid E_1\cdots E_{n-1}). \]
+\textbf{Proof:} write each conditional probability from the definition; the product telescopes: $P(E_1)\frac{P(E_1E_2)}{P(E_1)}\frac{P(E_1E_2E_3)}{P(E_1E_2)}\cdots=P(E_1\cdots E_n)$.
+\end{thmbox}
+
+\begin{methodbox}[Using the multiplication rule: draw a tree]
+Draw a tree whose branches are the successive events. \textbf{Multiply along a path} to get the probability that the whole path happens. Branch probabilities after the first stage are \emph{conditional} (they depend on what happened before). For sequential draws without replacement, update the counts on each branch.
+\end{methodbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(lecture / Ross Ex.\ 4a)} Jane's books: $P(B_1)=.5$, $P(B_1B_2)=.3$. $P(B_2\mid B_1)=\dfrac{.3}{.5}=.6$.
+\item \textbf{(lecture)} Two dice. $P(\text{sum}=8\mid\text{first}=3)$: given the first is 3, the second must be 5, one of 6 equally likely: $\dfrac{1/36}{1/6}=\dfrac16$ (unconditionally $\tfrac5{36}$).
+\item \textbf{(Ross Ex.\ 2a)} Joe's key is in his left pocket w.p.\ $.4$, right pocket w.p.\ $.4$ (else elsewhere). He checks the left pocket: no key. $P(\text{right}\mid\text{not left})=\dfrac{P(R)}{1-P(L)}=\dfrac{.4}{.6}=\dfrac23$ (since $R\subseteq L^c$, $RL^c=R$).
+\item \textbf{(Ross Ex.\ 2b)} Flip two fair coins. $P(\text{both heads}\mid\text{first is heads})=\tfrac12$, but $P(\text{both heads}\mid\text{at least one head})=\tfrac13$: given at least one head the three equally likely outcomes are $hh,ht,th$, and only $hh$ is both heads.
+\item \textbf{(Ross Ex.\ 2c)} Bridge: North--South have 8 spades between them. So the 26 East--West cards contain 5 spades; given that, all $\binom{26}{13}$ ways of giving East 13 of these cards are equally likely. $P(\text{East has exactly 3 spades})=\dfrac{\binom53\binom{21}{10}}{\binom{26}{13}}\approx.339$.
+\item \textbf{(Ross Ex.\ 2d)} Celine picks French or chemistry by a coin flip, with $P(A\mid\text{French})=\tfrac12$, $P(A\mid\text{chem})=\tfrac23$. $P(\text{chem and }A)=P(\text{chem})P(A\mid\text{chem})=\tfrac12\cdot\tfrac23=\tfrac13$.
+\item \textbf{(Ross Ex.\ 2e)} An urn has 8 red and 4 white balls; draw two without replacement. $P(R_1R_2)=P(R_1)P(R_2\mid R_1)=\dfrac8{12}\cdot\dfrac7{11}=\dfrac{14}{33}$.
+\item \textbf{(Ross Ex.\ 2g)} A deck is dealt into 4 piles of 13. $P(\text{each pile has exactly one ace})$: let $E_1=$ the ace of spades is in some pile (prob.\ 1); $E_2=$ the ace of hearts is in a different pile than the ace of spades: $\tfrac{39}{51}$; $E_3$: the ace of diamonds is in a third pile: $\tfrac{26}{50}$; $E_4$: $\tfrac{13}{49}$. Product $=\dfrac{39\cdot26\cdot13}{51\cdot50\cdot49}\approx.105$.
+\item \textbf{(Ross Ex.\ 2h)} 8 teams are randomly split into 4 pairs; 4 of the teams are strong. $P(\text{no two strong teams are paired})$: put strong team 1 with one of the other 7 (4 of which are weak): $\tfrac47$; then strong team 2 (among the 5 left, 3 are weak): $\tfrac35$; then $\tfrac23$; then 1. Product $\tfrac47\cdot\tfrac35\cdot\tfrac23\cdot1=\tfrac8{35}$.
+\item \textbf{(extra)} Draw two cards without replacement. $P(\text{both aces})=\tfrac4{52}\cdot\tfrac3{51}=\tfrac1{221}$. Given the first is an ace, $P(\text{second is an ace})=\tfrac3{51}$.
+\end{itemize}
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Total Probability and Bayes' Formula (Sec.\ 3.3)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+You often know probabilities in the \emph{causal} direction (``if the patient has the disease, the test is positive with probability .95'') but want the \emph{reverse} (``the test came back positive; how likely is the disease?''). Two steps:
+\begin{enumerate}
+\item \textbf{Total probability:} find $P(\text{evidence})$ by adding up \emph{all the ways} the evidence can happen, weighting each cause by how likely it is.
+\item \textbf{Bayes:} $P(\text{cause}\mid\text{evidence})=\dfrac{\text{the part of the evidence that came through this cause}}{\text{all the evidence}}$.
+\end{enumerate}
+\end{ideabox}
+
+\begin{thmbox}[Total probability, two-event form (Ross eq.\ 3.1)]
+Since $E=EF\cup EF^c$ (mutually exclusive),
+\[ P(E)=P(E\mid F)P(F)+P(E\mid F^c)P(F^c). \]
+A weighted average of conditional probabilities, each weighted by the probability of its condition.
+\end{thmbox}
+
+\begin{defbox}[Partition]
+Events $F_1,\dots,F_n$ form a \textbf{partition} of $S$ if they are mutually exclusive and exhaustive ($\bigcup F_i=S$): \emph{exactly one} of them occurs.
+\end{defbox}
+
+\begin{thmbox}[Law of Total Probability (Ross eq.\ 3.4)]
+If $F_1,\dots,F_n$ is a partition, then for any event $E$
+\[ P(E)=\sum_{i=1}^nP(EF_i)=\sum_{i=1}^nP(E\mid F_i)\,P(F_i). \]
+\end{thmbox}
+
+\begin{thmbox}[Bayes' Formula (Ross Prop.\ 3.1)]
+With $F_1,\dots,F_n$ a partition and $E$ an event that occurred,
+\[ P(F_j\mid E)=\frac{P(EF_j)}{P(E)}=\frac{P(E\mid F_j)\,P(F_j)}{\displaystyle\sum_{i=1}^nP(E\mid F_i)\,P(F_i)}. \]
+The denominator collects all the ways $E$ can happen; the numerator is the one way you care about. It reverses the conditioning, $P(E\mid F_j)\to P(F_j\mid E)$ (effect $\to$ cause). The $P(F_j)$ are the \textbf{prior} opinions; $P(F_j\mid E)$ is the \textbf{updated} (posterior) probability after seeing $E$.\\
+\textbf{Proof:} $P(F_j\mid E)=P(EF_j)/P(E)$; apply the multiplication rule to the numerator and total probability to the denominator.
+\end{thmbox}
+
+\begin{methodbox}[Bayes recipe (use this every time)]
+\begin{enumerate}
+\item Identify the \textbf{causes} $F_i$ (they must be a partition---mutually exclusive, exhaustive) and the \textbf{evidence} $E$.
+\item Write the priors $P(F_i)$ and the likelihoods $P(E\mid F_i)$ from the problem statement.
+\item Draw a \textbf{tree}: first the causes, then whether $E$ occurs. Multiply along branches.
+\item $P(E)=$ the \textbf{sum of all branches that end in $E$}.
+\item $P(F_j\mid E)=\dfrac{\text{branch through }F_j\text{ ending in }E}{P(E)}$.
+\item \textbf{Sanity check by natural frequencies:} imagine 1000 (or 100{,}000) people and count how many fall in each branch.
+\end{enumerate}
+\end{methodbox}
+
+\begin{defbox}[Odds and updating]
+The \textbf{odds} of $A$ are $\dfrac{P(A)}{P(A^c)}=\dfrac{P(A)}{1-P(A)}$. (If $P(A)=\tfrac25$ the odds are 2 to 3.) After observing evidence $E$, for a hypothesis $H$:
+\[ \frac{P(H\mid E)}{P(H^c\mid E)}=\frac{P(H)}{P(H^c)}\cdot\frac{P(E\mid H)}{P(E\mid H^c)}. \]
+\emph{New odds = old odds $\times$ likelihood ratio.} Evidence supports $H$ only if $P(E\mid H)>P(E\mid H^c)$; being merely ``consistent with'' $H$ is not enough (Ross: the Reese--Schapiro bridge-cheating example).
+\end{defbox}
+
+\begin{exbox}[Examples (Ross Sec.\ 3.3 and lecture)]
+\begin{itemize}
+\item \textbf{(Ex.\ 3a) Accident-prone policyholders.} 30\% of people are accident-prone; an accident-prone person has an accident in a year w.p.\ $.4$, others w.p.\ $.2$. $P(A)=.4(.3)+.2(.7)=.12+.14=.26$. Given a new policyholder has an accident: $P(\text{prone}\mid A)=\dfrac{.12}{.26}=\dfrac6{13}$.
+\item \textbf{(Ex.\ 3c) Multiple choice.} A student knows the answer w.p.\ $p$, else guesses among $m$ choices. $P(\text{knew}\mid\text{correct})=\dfrac{p}{p+\frac1m(1-p)}=\dfrac{mp}{1+(m-1)p}$. For $m=5$, $p=\tfrac12$: $\tfrac56$.
+\item \textbf{(Ex.\ 3d) Blood test.} A test detects a disease w.p.\ $.95$ if present, gives a false positive w.p.\ $.01$ if absent; $.5\%$ of the population has the disease. $P(D\mid+)=\dfrac{.95(.005)}{.95(.005)+.01(.995)}=\dfrac{.00475}{.0147}=\dfrac{95}{294}\approx.323$. So given a positive test, the person is still \emph{healthy} with probability $\approx.677$. \textbf{Why so low?} Per 200{,}000 people: 1000 diseased, of whom 950 test positive; 199{,}000 healthy, of whom 1990 test positive. Of the $2940$ positives only $950$ are truly sick.
+\item \textbf{(Ex.\ 3e)} A doctor is $60\%$ sure a patient has a disease $D$. A test is always positive for a diseased patient and positive $30\%$ of the time for a healthy one. Given a positive test: $P(D\mid+)=\dfrac{.6(1)}{.6(1)+.4(.3)}=\dfrac{.6}{.72}=\dfrac56\approx.833$.
+\item \textbf{(Ex.\ 3f) Inspector.} A suspect is $60\%$ likely to be guilty. A characteristic found at the crime scene is present in $20\%$ of the population (so an innocent suspect has it w.p.\ $.2$; a guilty one for sure). $P(G\mid C)=\dfrac{.6}{.6+.4(.2)}=\dfrac{.6}{.68}\approx.882$.
+\item \textbf{(Ex.\ 3i)} An urn has two type-A coins (heads w.p.\ $\tfrac14$) and one type-B coin (heads w.p.\ $\tfrac34$). A random coin is flipped and lands heads. $P(A\mid H)=\dfrac{\frac23\cdot\frac14}{\frac23\cdot\frac14+\frac13\cdot\frac34}=\dfrac{1/6}{1/6+1/4}=\dfrac25$ (odds $2:3$).
+\item \textbf{(Ex.\ 3l) Three cards.} One card is red on both sides (RR), one black on both (BB), one red/black (RB). A random card is placed down and shows red. $P(\text{other side black})=\tfrac13$ (not $\tfrac12$!). There are 6 equally likely card-sides; 3 are red; of those only 1 (the red side of RB) has a black back. By Bayes: $\dfrac{P(RB)P(\text{red up}\mid RB)}{P(\text{red up})}=\dfrac{\frac13\cdot\frac12}{\frac12}=\tfrac13$.
+\item \textbf{(Ex.\ 3n) Flashlights.} A bin contains three types of flashlight, with proportions $20\%,30\%,50\%$, and a type-$i$ flashlight lasts more than 100 hours w.p.\ $.7,.4,.3$. $P(A)=.2(.7)+.3(.4)+.5(.3)=.14+.12+.15=.41$. Given a flashlight lasted $>100$ h: $P(\text{type }1\mid A)=\tfrac{14}{41}$, $P(\text{type }2\mid A)=\tfrac{12}{41}$, $P(\text{type }3\mid A)=\tfrac{15}{41}$ (sum $=1$ \checkmark).
+\item \textbf{(lecture / SOA) ER patients.} Patients arrive critical/serious/stable w.p.\ $10\%/30\%/60\%$; death rates $40\%/10\%/1\%$. $P(\text{survive})=.1(.6)+.3(.9)+.6(.99)=.06+.27+.594=.924$. $P(\text{serious}\mid\text{survived})=\dfrac{.27}{.924}\approx.292$ (multiple-choice answer (B)).
+\item \textbf{(lecture) Urn without replacement} (3 white, 2 red): $P(W_2)=\tfrac35\cdot\tfrac24+\tfrac25\cdot\tfrac34=\tfrac35$ (same as $P(W_1)$---symmetry!). $P(W_1\mid R_2)=\dfrac{P(W_1R_2)}{P(R_2)}=\dfrac{6/20}{8/20}=\tfrac34$.
+\item \textbf{(lecture) Two dice, given sum is 8}: $P(\text{first}=3\mid8)=\tfrac15$; $P(\text{both}=3\mid8)=0$; $P(\text{at least one is }3\mid8)=\tfrac25$ (only $(3,5),(5,3)$ out of the 5 pairs).
+\end{itemize}
+\end{exbox}
+
+\begin{exbox}[Two-children problem (Ross Ex.\ 3m): always state how the information arrived]
+A family has two children, each equally likely a boy or a girl, independently. (i) \emph{Told only that at least one is a girl:} $P(GG\mid\text{at least one }G)=\dfrac{1/4}{3/4}=\tfrac13$. (ii) \emph{The mother is seen with one of her children, chosen at random, and it is a girl:} $P(GG\mid\text{girl seen})=\dfrac{\frac14\cdot1}{\frac14\cdot1+\frac24\cdot\frac12}=\tfrac12$. In general if a mixed family shows its girl with probability $q$, the answer is $\dfrac1{1+2q}$ (which is $\tfrac13$ when $q=1$, $\tfrac12$ when $q=\tfrac12$). Moral: the question is not well-defined until you specify the sample space and how the child was picked.
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Independent Events (Sec.\ 3.4)}\label{sec:indep}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+Two events are \textbf{independent} when learning that one happened does not change the probability of the other. In symbols $P(E\mid F)=P(E)$. Multiplying that by $P(F)$ gives the working definition $P(EF)=P(E)P(F)$. Physical independence (separate coin flips, separate dice) is the usual source, but you can also \emph{verify} independence numerically by checking the product rule.
+\end{ideabox}
+
+\begin{defbox}[Independence of two events]
+Events $E$ and $F$ are \textbf{independent} if
+\[ P(EF)=P(E)\,P(F). \]
+Equivalently $P(E\mid F)=P(E)$ (when $P(F)>0$), equivalently $P(F\mid E)=P(F)$ (when $P(E)>0$): if one of these holds, they all hold. Events that are not independent are \textbf{dependent}.
+\end{defbox}
+
+\begin{thmbox}[Complements (Ross Prop.\ 4.1 of Sec.\ 3.4)]
+If $E$ and $F$ are independent, so are $E$ and $F^c$ (hence also $E^c$ and $F$, and $E^c$ and $F^c$).\\
+\emph{Proof:} $P(EF^c)=P(E)-P(EF)=P(E)-P(E)P(F)=P(E)\big(1-P(F)\big)=P(E)P(F^c)$.
+\end{thmbox}
+
+\begin{defbox}[Independence of three or more events]
+Events $E_1,\dots,E_n$ are \textbf{independent} if \emph{every} subcollection $E_{i_1},\dots,E_{i_r}$ ($r\le n$) satisfies $P(E_{i_1}\cdots E_{i_r})=P(E_{i_1})\cdots P(E_{i_r})$: all pairs, all triples, all quadruples, \dots. For three events $E,F,G$ you must verify all \textbf{four}:
+\begin{align*}
+P(EF)&=P(E)P(F), & P(EG)&=P(E)P(G),\\
+P(FG)&=P(F)P(G), & P(EFG)&=P(E)P(F)P(G).
+\end{align*}
+If $E,F,G$ are independent, then $E$ is independent of any event built from $F$ and $G$ (e.g.\ $F\cup G$). An infinite collection is independent if every finite subcollection is. \textbf{Independent trials} are subexperiments whose outcomes do not affect each other.
+\end{defbox}
+
+\begin{warnbox}[Pairwise independence is not enough; and independence is not exclusivity]
+\textbf{(Ross Ex.\ 4e)} Roll two dice. $E=$ ``sum is 7'', $F=$ ``first die is 4'', $G=$ ``second die is 3''. $P(E)=\tfrac16$ and $P(F)=P(G)=\tfrac16$; $P(EF)=\tfrac1{36}$, $P(EG)=\tfrac1{36}$, $P(FG)=\tfrac1{36}$: all pairs are independent. But $P(EFG)=\tfrac1{36}\ne\tfrac1{216}$ ($P(E\mid FG)=1$). So $E,F,G$ are \emph{not} independent.\\
+\textbf{(lecture)} Toss a fair coin 3 times. $A=$ first two tosses match, $B=$ last two match, $C=$ first and third match. Each has probability $\tfrac12$. Any two of them occur together exactly when all three tosses are equal, so $P(AB)=P(AC)=P(BC)=\tfrac28=\tfrac14=\tfrac12\cdot\tfrac12$: the events are pairwise independent. But $P(ABC)=P(\text{all equal})=\tfrac14\ne\tfrac18$.\\
+\textbf{Mutually exclusive} events with positive probability are \emph{never} independent: $P(EF)=0\ne P(E)P(F)>0$. (Knowing $E$ occurred tells you $F$ did not.)
+\end{warnbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(Ross Ex.\ 4a)} Draw a card. $E=$ ace, $F=$ spade: $P(EF)=\tfrac1{52}=\tfrac4{52}\cdot\tfrac{13}{52}$. Independent.
+\item \textbf{(Ross Ex.\ 4b)} Flip two fair coins. $E=$ first is heads, $F=$ second is tails: $P(EF)=\tfrac14=\tfrac12\cdot\tfrac12$. Independent.
+\item \textbf{(Ross Ex.\ 4c / lecture)} Two dice, $F=$ first die is 4. ``Sum is 6'' is \emph{not} independent of $F$ ($\tfrac1{36}\ne\tfrac5{36}\cdot\tfrac16$). ``Sum is 7'' \emph{is} independent of $F$ ($\tfrac1{36}=\tfrac16\cdot\tfrac16$). ``Sum is 8'' with first die 3: not independent.
+\item \textbf{(lecture)} 50\% of clients are married, 30\% have a degree, 15\% are both: $.5\times.3=.15$, so ``married'' and ``degree'' are independent.
+\item \textbf{(Ross Ex.\ 4f) Independent trials}, each a success w.p.\ $p$: $P(\text{all }n\text{ succeed})=p^n$. $P(\text{at least one success in }n)=1-(1-p)^n$ (complement: all fail). $P(\text{exactly }k\text{ successes in }n)=\binom nkp^k(1-p)^{n-k}$ (choose which trials succeed; multiply).
+\item \textbf{(Ross Ex.\ 4g)} \emph{Parallel system}: works if at least one component works; independent components with $P(\text{component }i\text{ works})=p_i$: $P(\text{works})=1-\prod_{i=1}^n(1-p_i)$. \emph{Series system}: works only if all work: $\prod p_i$.
+\item \textbf{(Ross Ex.\ 4h)} Roll two dice repeatedly. $P(\text{a sum of 5 appears before a sum of 7})=\dfrac{4/36}{4/36+6/36}=\dfrac25$. In general, for mutually exclusive $E,F$ and independent trials, $P(E\text{ before }F)=\dfrac{P(E)}{P(E)+P(F)}$ (the trials on which neither occurs don't matter).
+\item \textbf{(extra)} Probability of at least one 6 in 4 rolls of a die: $1-(5/6)^4\approx.518$.
+\end{itemize}
+\end{exbox}
+
+\begin{defbox}[Recap: ``and'' and ``or''. Memorize.]
+$P(A\text{ or }B)=P(A)+P(B)-P(AB)$ in general; $=P(A)+P(B)$ if mutually exclusive.\\
+$P(A\text{ and }B)=P(A)\,P(B\mid A)$ in general; $=P(A)\,P(B)$ if independent.\\
+$P(\text{at least one})=1-P(\text{none})$; for independent events $P(\text{none})=\prod(1-p_i)$.
+\end{defbox}
+
+\begin{warnbox}[Common mistakes in Chapter 3]
+\begin{itemize}
+\item Swapping $P(E\mid F)$ and $P(F\mid E)$ (``prosecutor's fallacy'').
+\item In Bayes, using a denominator that isn't the sum of \emph{all} branches ending in the evidence.
+\item Using $P(AB)=P(A)P(B)$ without having established independence (e.g.\ for draws without replacement).
+\item Thinking mutually exclusive $\Rightarrow$ independent (it is nearly the opposite).
+\item Gambler's fallacy: independent trials have no memory (see Self-Test 3.18).
+\end{itemize}
+\end{warnbox}
+
+\clearpage
+%=====================================================================
+\section{Chapter 4 -- Discrete Random Variables (Sec.\ 4.1--4.5)}\label{sec:ch4}
+%=====================================================================
+
+%---------------------------------------------------------------------
+\subsection{Random Variables, PMF and CDF (Sec.\ 4.1)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+Often we care about a \emph{number} computed from the outcome rather than the outcome itself: the number of heads, the sum of two dice, your winnings. A \textbf{random variable} (R.V.) is that rule. Once you know the possible values and the probability of each, you can forget the original experiment. The table of ``value $\to$ probability'' is the \textbf{distribution} of the R.V.
+\end{ideabox}
+
+\begin{defbox}[Random variable]
+A \textbf{random variable} is a real-valued function defined on the sample space: it assigns to each outcome a number. Lecture versions: \emph{preliminary}---the range of a numerically valued function whose domain is the sample space; \emph{preferred}---the numerically valued domain of a function whose range is a probability distribution (i.e.\ we may forget the sample space and specify only the values and their probabilities; different experiments can give the same R.V.; we can even ``invent'' one by making up numbers that satisfy the conditions below).\\
+\textbf{Notation:} capital letter $X$ for the R.V., lowercase $x$ for a particular value it takes. $\{X=x\}$ is the \emph{event} ``the outcome is one that makes $X$ equal $x$''.
+\end{defbox}
+
+\begin{exbox}[From outcomes to a distribution: heads in 2 flips]
+$S=\{hh,ht,th,tt\}$ (each prob.\ $\tfrac14$). $X=$ number of heads. The mapping: $hh\mapsto2$, $ht\mapsto1$, $th\mapsto1$, $tt\mapsto0$. Group outcomes by value: $\{X=0\}=\{tt\}$, $\{X=1\}=\{ht,th\}$, $\{X=2\}=\{hh\}$. So the \textbf{PMF} is
+\begin{center}
+\begin{tabular}{c|ccc}
+$x$ & 0 & 1 & 2\\\hline
+$p(x)$ & $.25$ & $.50$ & $.25$\\
+$F(x)$ & $.25$ & $.75$ & $1.00$
+\end{tabular}
+\end{center}
+\end{exbox}
+
+\begin{defbox}[Probability mass function (PMF) / probability distribution]
+For a discrete R.V.\ $X$, the PMF is $p(a)=P(X=a)$. It must satisfy
+\[ \text{(1) } p(x)\ge0\text{ for all }x,\qquad\text{(2) }\sum_xp(x)=1. \]
+A named R.V.\ has one PMF; a different distribution means a different R.V.
+\end{defbox}
+
+\begin{defbox}[Cumulative distribution function (CDF)]
+$F(x)=P(X\le x)$ for $-\infty<x<\infty$. Properties: $F$ is \textbf{nondecreasing} (if $a<b$ then $\{X\le a\}\subseteq\{X\le b\}$, so $F(a)\le F(b)$); $F(-\infty)=0$, $F(+\infty)=1$. For a discrete R.V.
+\[ F(a)=\sum_{x\le a}p(x),\qquad p(x_i)=F(x_i)-F(x_{i-1}), \]
+so $F$ is a \textbf{step function}: it is flat between possible values, and at each possible value $x_i$ it jumps up by $p(x_i)$. Useful: $P(X>a)=1-F(a)$ and $P(a<X\le b)=F(b)-F(a)$. (Lecture: the CDF can be used to simulate any R.V.\ from a uniform random number.)
+\end{defbox}
+
+\begin{methodbox}[How to find the PMF of a described R.V.]
+\begin{enumerate}
+\item List the possible values of $X$ (the support).
+\item For each value $x$ describe the event $\{X=x\}$ in terms of outcomes and compute its probability (counting, or multiplication rule for independent stages).
+\item Check $p(x)\ge0$ and $\sum p(x)=1$. (If the sum isn't 1, you missed outcomes or double counted.)
+\item For the CDF, accumulate: $F(x)=$ running total of $p$.
+\end{enumerate}
+\end{methodbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(Ross Ex.\ 1a)} $Y=$ heads in 3 fair flips: $p(0)=\tfrac18$, $p(1)=\tfrac38$, $p(2)=\tfrac38$, $p(3)=\tfrac18$.
+\item \textbf{(Ross Ex.\ 1b)} Two clients whose deaths are independent with probabilities $.05$ (younger) and $.10$ (older); $X=$ payout in units of \$100{,}000 (one unit per death): $P(X=0)=.95(.90)=.855$; $P(X=1)=.05(.90)+.95(.10)=.045+.095=.140$; $P(X=2)=.05(.10)=.005$. (Sum $=1$ \checkmark.)
+\item \textbf{(Ross Ex.\ 1c)} Choose 4 balls from those numbered $1,\dots,20$; $X=$ the largest number chosen. $\{X=i\}$: ball $i$ chosen plus 3 balls from $1,\dots,i-1$: $P(X=i)=\dfrac{\binom{i-1}3}{\binom{20}4}$, $i=4,\dots,20$. $P(X\le10)=\dfrac{\binom{10}4}{\binom{20}4}$ (all four numbers are in $\{1,\dots,10\}$).
+\item \textbf{(Ross Ex.\ 1d)} Flip a coin (heads w.p.\ $p$) until a head appears or $n$ flips have been made; $X=$ number of flips. $P(X=k)=(1-p)^{k-1}p$ for $k=1,\dots,n-1$ (tails $k-1$ times, then heads) and $P(X=n)=(1-p)^{n-1}$ (first $n-1$ are tails, and the game stops regardless of flip $n$).
+\item \textbf{(extra)} Two dice, $X=$ sum: $p(2)=\tfrac1{36},p(3)=\tfrac2{36},\dots,p(7)=\tfrac6{36},\dots,p(12)=\tfrac1{36}$ ($p(k)=\frac{6-|k-7|}{36}$). $F(7)=\tfrac{21}{36}=\tfrac7{12}$. $P(X>9)=1-F(9)=1-\tfrac{30}{36}=\tfrac16$.
+\item \textbf{(extra)} Two dice, $M=$ the larger value: $P(M=k)=\dfrac{2k-1}{36}$ ($k=1,\dots,6$): both $\le k$ has $k^2$ outcomes, so $P(M\le k)=k^2/36$ and $P(M=k)=(k^2-(k-1)^2)/36$. Sum $=\frac{1+3+5+7+9+11}{36}=1$ \checkmark.
+\end{itemize}
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Discrete Random Variables (Sec.\ 4.2)}
+%---------------------------------------------------------------------
+
+\begin{defbox}[Discrete random variable]
+A random variable that can take on \textbf{at most a countable number of possible values} (a finite list, or a countably infinite list such as $1,2,3,\dots$) is called \textbf{discrete}.
+\end{defbox}
+
+\begin{methodbox}[Finding an unknown constant in a PMF]
+Use $\sum_xp(x)=1$ and solve for the constant (also check $p\ge0$). For infinite lists use the geometric series $\sum_{n\ge0}ar^n=\frac a{1-r}$ or $\sum\frac{\lambda^i}{i!}=e^\lambda$.
+\end{methodbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(lecture)} Toss a fair coin until the first head; $X=$ number of tosses. $p(n)=\left(\tfrac12\right)^{n-1}\tfrac12=\tfrac1{2^n}$, $n=1,2,3,\dots$ (tails $n-1$ times, then heads). Total: $\sum_{n\ge1}\tfrac1{2^n}=\dfrac{1/2}{1-1/2}=1$ \checkmark. Then $P(X\le3)=\tfrac12+\tfrac14+\tfrac18=\tfrac78$ and $P(X\text{ even})=\tfrac14+\tfrac1{16}+\cdots=\dfrac{1/4}{1-1/4}=\tfrac13$.
+\item \textbf{(Ross Ex.\ 2a)} $p(i)=c\,\lambda^i/i!$ for $i=0,1,2,\dots$ (with $\lambda>0$). $1=\sum_ic\lambda^i/i!=c\,e^\lambda$ so $c=e^{-\lambda}$. Then $P(X=0)=e^{-\lambda}$ and $P(X>2)=1-P(0)-P(1)-P(2)=1-e^{-\lambda}-\lambda e^{-\lambda}-\dfrac{\lambda^2e^{-\lambda}}2$.
+\item \textbf{(Ross)} $p(1)=\tfrac14,\;p(2)=\tfrac12,\;p(3)=\tfrac18,\;p(4)=\tfrac18$. CDF: $F(a)=0$ for $a<1$; $\tfrac14$ for $1\le a<2$; $\tfrac34$ for $2\le a<3$; $\tfrac78$ for $3\le a<4$; $1$ for $a\ge4$. (Note $F(2.5)=\tfrac34$ even though 2.5 is not a possible value; jump at 2 is $\tfrac34-\tfrac14=\tfrac12=p(2)$.)
+\item \textbf{(Review \#8)} $P(X=x)=cx^2$ for $x=1,2,3$: $c(1+4+9)=1\Rightarrow c=\tfrac1{14}$. Then $p(1)=\tfrac1{14},p(2)=\tfrac4{14},p(3)=\tfrac9{14}$.
+\item \textbf{(extra)} $p(x)=c\,(1/3)^x$, $x=1,2,3,\dots$: $c\cdot\dfrac{1/3}{1-1/3}=\dfrac c2=1\Rightarrow c=2$.
+\end{itemize}
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Expected Value (Sec.\ 4.3)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+The \textbf{expected value} $\E[X]$ is the \emph{probability-weighted average} of the values of $X$. If you repeated the experiment many times, the average of the results would settle near $\E[X]$ (the long-run average per trial). On a number line with the probabilities as weights, $\E[X]$ is the balance point (center of gravity). It plays the role of the mean $\mu$ in statistics. \textbf{It need not be a possible value} (a die's expected value is $3.5$).
+\end{ideabox}
+
+\begin{defbox}[Expected value]
+For a discrete R.V.\ $X$ with PMF $p$,
+\[ \E[X]=\sum_{x:\,p(x)>0}x\,p(x). \]
+(For an infinite support the series must converge.)
+\end{defbox}
+
+\begin{methodbox}[{Computing $\E[X]$ with a table}]
+Make a table with columns $x$, $p(x)$, $x\,p(x)$. Add the last column. (For variance in Sec.~4.5 add a column $x^2p(x)$.)
+\end{methodbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(lecture)} Heads in 2 tosses: $\E[X]=0(.25)+1(.5)+2(.25)=1$.
+\item \textbf{(Ross Ex.\ 3a)} Fair die: $\E[X]=\tfrac16(1+2+\cdots+6)=\tfrac{21}6=\tfrac72$.
+\item \textbf{(Ross Ex.\ 3b)} Indicator variable $I_A=1$ if $A$ occurs, $0$ otherwise: $\E[I_A]=1\cdot P(A)+0\cdot P(A^c)=P(A)$. (Expected value of an indicator is a probability.)
+\item \textbf{(Ross Ex.\ 3d / lecture)} 120 students are bused to a game in buses carrying 36, 40 and 44 students. Pick a student at random; $X=$ the number of students on that student's bus. $p(36)=\tfrac{36}{120},p(40)=\tfrac{40}{120},p(44)=\tfrac{44}{120}$ so $\E[X]=\dfrac{36^2+40^2+44^2}{120}=\dfrac{4832}{120}\approx40.27$. This exceeds the average bus size $\tfrac{36+40+44}3=40$: bigger buses hold more students, so they are more likely to be the chosen student's bus. (Same phenomenon as Self-Test 4.4.)
+\item \textbf{(Ross Ex.\ 3c) Quiz show.} You may answer question 1 (worth $V_1$, you know it w.p.\ $P_1$) or question 2 (worth $V_2$, prob.\ $P_2$) first; you may attempt the second only if you get the first right. Starting with question 1: $\E=V_1P_1+V_2P_1P_2$. Starting with question 2: $\E=V_2P_2+V_1P_1P_2$. The first order is better iff $V_1P_1(1-P_2)>V_2P_2(1-P_1)$, i.e.\ iff $\dfrac{V_1P_1}{1-P_1}>\dfrac{V_2P_2}{1-P_2}$.
+\item \textbf{(extra) Fair price of a game.} A \$2 ticket pays \$100 w.p.\ $.01$ and \$0 otherwise. Expected payout $=100(.01)=\$1$, so the expected \emph{net} gain is $1-2=-\$1$ per ticket.
+\item \textbf{(extra)} $X=$ number rolled on a die; you win $X$ dollars if $X$ is even and nothing if odd: $\E[\text{win}]=\tfrac16(2+4+6)=2$.
+\end{itemize}
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Expectation of a Function of a Random Variable (Sec.\ 4.4)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+If $Y=g(X)$ you do \emph{not} need to find the PMF of $Y$: just apply $g$ to each value of $X$ and keep weighting by the \emph{PMF of $X$}.
+\end{ideabox}
+
+\begin{thmbox}[Proposition 4.1 and linearity rules]
+\begin{enumerate}
+\item $\displaystyle\E[g(X)]=\sum_ig(x_i)\,p(x_i)$.\\
+\emph{Proof:} group the $x_i$ having the same value $g(x_i)=y_j$: $\sum_j y_jP(g(X)=y_j)=\sum_j\sum_{i:g(x_i)=y_j}g(x_i)p(x_i)$.
+\item $\E[c]=c$ for a constant $c$.
+\item $\E[cX]=c\,\E[X]$.
+\item \textbf{Corollary 4.1:} $\E[aX+b]=a\,\E[X]+b$.\\
+\emph{Proof:} $\sum(ax_i+b)p(x_i)=a\sum x_ip(x_i)+b\sum p(x_i)=a\E[X]+b\cdot1$.
+\item $\E[X+Y]=\E[X]+\E[Y]$ (proved later for joint distributions; true for any two random variables).
+\end{enumerate}
+When $g$ is \textbf{linear}, $\E[g(X)]=g(\E[X])$. The \textbf{$n$th moment} of $X$ is $\E[X^n]=\sum x^np(x)$; $\E[X]$ is the mean or first moment.
+\end{thmbox}
+
+\begin{warnbox}
+In general $\E[g(X)]\ne g(\E[X])$. In particular $\E[X^2]\ne(\E[X])^2$, and $\E[1/X]\ne1/\E[X]$.
+\end{warnbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(Ross Ex.\ 4a)} $P(X=-1)=.2$, $P(X=0)=.5$, $P(X=1)=.3$. $\E[X^2]=(-1)^2(.2)+0^2(.5)+1^2(.3)=.5$, whereas $(\E[X])^2=(-.2+.3)^2=(.1)^2=.01$.
+\item \textbf{(lecture)} $X=$ heads in 2 tosses ($\E[X]=1$), $Y=2X+3$, $Z=X^2$. By Cor.\ 4.1: $\E[Y]=2(1)+3=5$. And $\E[Z]=0(.25)+1(.5)+4(.25)=1.5\ne1=(\E[X])^2$.
+\item \textbf{(extra)} Fair die $X$: $\E[X^2]=\tfrac16(1+4+9+16+25+36)=\tfrac{91}6\approx15.17$, while $(\E[X])^2=\tfrac{49}4=12.25$.
+\item \textbf{(extra)} A game pays $2X+3$ dollars where $X$ is the die roll: $\E=2(3.5)+3=10$.
+\end{itemize}
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Variance (Sec.\ 4.5)}
+%---------------------------------------------------------------------
+
+\begin{ideabox}
+The mean says where the distribution is centered, not how spread out it is. Compare $W\equiv0$; $Y=\pm1$ with probability $\tfrac12$ each; $Z=\pm100$ with probability $\tfrac12$ each. All have mean 0 but wildly different spread. \textbf{Variance} measures spread: the average \emph{squared} distance from the mean. (The average signed deviation $\E[X-\mu]$ is always 0; $\E|X-\mu|$ works but is awkward algebraically; squaring is convenient.) The \textbf{standard deviation} takes the square root so that it is in the same units as $X$.
+\end{ideabox}
+
+\begin{defbox}[Variance and standard deviation]
+With $\mu=\E[X]$,
+\[ \Var[X]=\sigma_X^2=\E\big[(X-\mu)^2\big]=\sum_i(x_i-\mu)^2p(x_i),\qquad \SD[X]=\sigma_X=\sqrt{\Var[X]}. \]
+\end{defbox}
+
+\begin{thmbox}[Computational formula]
+\[ \Var[X]=\E[X^2]-\big(\E[X]\big)^2=\E[X^2]-\mu^2. \]
+Since $\Var[X]\ge0$ (a sum of nonnegative terms), $\E[X^2]\ge(\E[X])^2$ always.\\
+\textbf{Proof:} $\sum(x_i-\mu)^2p(x_i)=\sum x_i^2p(x_i)-2\mu\sum x_ip(x_i)+\mu^2\sum p(x_i)=\E[X^2]-2\mu^2+\mu^2=\E[X^2]-\mu^2$.
+\end{thmbox}
+
+\begin{thmbox}[Rules for variance]
+\begin{enumerate}
+\item $\Var[g(X)]=\sum\big(g(x_i)-\E[g(X)]\big)^2p(x_i)$.
+\item $\Var[c]=0$ for a constant (no dispersion).
+\item $\Var[aX]=a^2\Var[X]$.
+\item $\Var[aX+b]=a^2\Var[X]$; in particular $\Var[X+b]=\Var[X]$ (shifting does not change spread). So $\SD[aX+b]=|a|\SD[X]$.
+\item $\Var[X+Y]=\Var[X]+\Var[Y]$ \textbf{only if $X$ and $Y$ are independent} (covered later).
+\end{enumerate}
+\end{thmbox}
+
+\begin{methodbox}[Computing variance with a table]
+Columns: $x$, $p(x)$, $x\,p(x)$, $x^2p(x)$. Sum the third column to get $\E[X]$, the fourth to get $\E[X^2]$. Then $\Var[X]=\E[X^2]-(\E[X])^2$ (compute $\E[X^2]$ with $X^2$, \emph{not} the square of $\E[X]$).
+\end{methodbox}
+
+\begin{exbox}[Examples]
+\begin{itemize}
+\item \textbf{(lecture)} Heads in 2 tosses: $\E[X^2]=0(.25)+1(.5)+4(.25)=1.5$, so $\Var[X]=1.5-1^2=.5$, $\SD=\sqrt{.5}\approx.707$.
+\item \textbf{(Ross Ex.\ 5a)} Fair die: $\E[X]=\tfrac72$, $\E[X^2]=\tfrac{91}6$, so $\Var[X]=\tfrac{91}6-\tfrac{49}4=\tfrac{182-147}{12}=\tfrac{35}{12}\approx2.92$.
+\item \textbf{(lecture)} Data set $V=\{1,1,2,2,5,8,8,9,9\}$ (9 values, each with probability $\tfrac19$): $\mu=\tfrac{45}9=5$, $\E[V^2]=\tfrac{1+1+4+4+25+64+64+81+81}9=\tfrac{325}9$, so $\Var[V]=\tfrac{325}9-25=\tfrac{100}9\approx11.11$. For $N=\{4,4,4,5,5,5,6,6,6\}$: $\mu=5$, $\E[N^2]=\tfrac{3(16+25+36)}9=\tfrac{77}3$, so $\Var[N]=\tfrac{77}3-25=\tfrac23$. Same mean, much smaller spread.
+\item \textbf{(extra) Bernoulli/indicator:} $X\in\{0,1\}$ with $p=P(X=1)$: $\E[X]=p$, $\E[X^2]=p$, so $\Var[X]=p-p^2=p(1-p)$. (Used in Self-Test 4.5.)
+\item \textbf{(extra)} $X=$ heads in 2 tosses, $Y=2X+3$: $\Var[Y]=2^2\Var[X]=4(.5)=2$ (the ``+3'' does nothing).
+\end{itemize}
+\end{exbox}
+
+\begin{warnbox}[Common mistakes in Chapter 4]
+\begin{itemize}
+\item Computing $\E[X^2]$ as $(\E[X])^2$. They differ by exactly $\Var[X]$.
+\item $\Var[aX]=a\Var[X]$ (wrong: $a^2$). $\Var[X+b]=\Var[X]+b$ (wrong: unchanged).
+\item A PMF that does not sum to 1, or a CDF that decreases.
+\item Using $\sum x\,p(x)$ with \emph{unnormalized} weights: always check $\sum p=1$ first.
+\item Confusing $P(X\le a)$ with $P(X<a)$ for a discrete R.V.\ (they differ by $P(X=a)$).
+\end{itemize}
+\end{warnbox}
+
+\clearpage
+%=====================================================================
+\section{Review-Sheet Checklist: What to Say for Each Item}\label{sec:checklist}
+%=====================================================================
+
+The professor said the exam will ask you to \textbf{state a formula, define, and perhaps explain in plain language or give an example} for a subset of these items. The ``write this'' column is the version to put on the exam (precise, unambiguous). Cover the right two columns and test yourself.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.8in}>{\raggedright\arraybackslash}p{2.3in}@{}}
+\toprule
+\textbf{Item} & \textbf{Write this (formula/definition)} & \textbf{Plain language / example}\\
+\midrule
+\endhead
+(a) Multiplication principle & If an experiment consists of $r$ stages and stage $i$ has $n_i$ possible outcomes regardless of the outcomes of earlier stages, the total number of outcomes is $n_1n_2\cdots n_r$. & 7-place plates: $26^3\cdot10^4$. Think ``decision tree'': multiply the branch counts.\\
+(b) Permutation & An ordered arrangement of objects. $n$ distinct objects can be ordered in $n!$ ways; ordered selections of $r$ from $n$: $\;{}_nP_r=\frac{n!}{(n-r)!}$. If $n_i$ objects are alike: $\frac{n!}{n_1!\cdots n_r!}$. & Photo of 4 of 10 people in a line: ${}_{10}P_4=5040$. PEPPER: $\frac{6!}{3!2!1!}=60$.\\
+(c) Combination & An unordered selection (subset) of $r$ objects from $n$: $\binom nr=\frac{n!}{r!(n-r)!}$. & Committee of 3 from 20: $\binom{20}3=1140$. Order doesn't matter, so divide ${}_nP_r$ by $r!$.\\
+(d) Partition & Dividing $n$ distinct objects into (labelled) groups of sizes $r_1,\dots,r_k$ with $\sum r_i=n$: $\frac{n!}{r_1!\cdots r_k!}$ ways (multinomial coefficient). & 9 people into committees of 2, 3, 4: $\frac{9!}{2!3!4!}=1260$.\\
+(e) Binomial theorem & $(x+y)^n=\sum_{k=0}^n\binom nkx^ky^{n-k}$. & Expanding $n$ factors: choose which $k$ give an $x$. $(x+y)^3=x^3+3x^2y+3xy^2+y^3$.\\
+(f) Proof by induction & \emph{(not tested)} &\\
+(g) Sample space & The set $S$ of all possible outcomes of an experiment. & Two dice: 36 ordered pairs.\\
+(h) Event & A subset of the sample space; it \emph{occurs} if the outcome belongs to it. & ``Sum is 7'' $=\{(1,6),\dots,(6,1)\}$.\\
+(i) Mutually exclusive & Events $A,B$ with $A\cap B=\emptyset$. & Cannot both happen: sum 6 and sum 7.\\
+(j) Three axioms & (1) $0\le P(E)\le1$; (2) $P(S)=1$; (3) for mutually exclusive $E_1,E_2,\dots$: $P(\bigcup E_i)=\sum P(E_i)$. & Probability = total mass 1; non-overlapping masses add.\\
+(k) Equally likely outcomes & If $S$ is finite and all outcomes are equally likely then $P(E)=\frac{N(E)}{N(S)}$. & Only valid when outcomes are equally likely (not for sums of dice).\\
+(l) Conditional probability & $P(B\mid A)=\frac{P(A\cap B)}{P(A)}$ for $P(A)>0$. & Shrink the universe to $A$; fraction of it in $B$.\\
+(m) Bayes' formula & If $F_1,\dots,F_n$ are mutually exclusive and exhaustive, $P(F_j\mid E)=\dfrac{P(E\mid F_j)P(F_j)}{\sum_{i}P(E\mid F_i)P(F_i)}$. & Reverses conditioning; disease test: $P(D\mid+)$ from $P(+\mid D)$.\\
+(n) Independence (2 events) & $P(A\cap B)=P(A)P(B)$; equivalently $P(A\mid B)=P(A)$. & Knowing $A$ doesn't change $B$'s probability. Separate coin flips.\\
+(o) Independence (3+ events) & $E_1,\dots,E_n$ are independent if for \emph{every} subcollection $E_{i_1},\dots,E_{i_r}$: $P(E_{i_1}\cdots E_{i_r})=P(E_{i_1})\cdots P(E_{i_r})$. & Pairs \emph{and} triples \emph{and}\dots. Pairwise independence alone is not enough (3-coin-toss example).\\
+(p) Random variable & A real-valued function on the sample space (a numerical quantity determined by the outcome). & $X=$ number of heads in 2 flips.\\
+(q) PMF & For discrete $X$: $p(x)=P(X=x)$, with $p(x)\ge0$ and $\sum_xp(x)=1$. & Table of value $\to$ probability.\\
+(r) CDF & $F(x)=P(X\le x)$, for all real $x$; nondecreasing; for discrete $X$ a step function with jump $p(x_i)$ at $x_i$. & $F(1)=P(X\le1)=.75$ for 2 tosses.\\
+(s) Expected value & For discrete $X$: $\E[X]=\sum_xx\,p(x)$ (sum over $x$ with $p(x)>0$). & Probability-weighted average; long-run average; center of gravity.\\
+\bottomrule
+\end{longtable}
+\end{center}
+
+%=====================================================================
+\section{Review-Sheet Practice Problems: Detailed Worked Solutions}\label{sec:practice}
+%=====================================================================
+
+\emph{Try each problem yourself before reading the answer.} The problem statements below are my paraphrases of the review sheet (numbering as on the sheet); the numbers are the ones I worked from. Check them against your copy of the sheet.
+
+\begin{exbox}[\#2 Phone numbers]
+\textbf{Problem.} 7-digit phone numbers; the first digit cannot be 0 or 1; the number cannot begin with 555. How many numbers are possible?\\
+\textbf{Solution.} Stage by stage: first digit has 8 options ($2,\dots,9$), each of the other 6 digits has 10. By the multiplication principle there are $8\cdot10^6$ numbers satisfying the first condition. Now remove the forbidden ones: those starting 555. The first digit 5 is allowed, so these are in our set; the next two digits are forced (5,5) and the last four are free: $10^4$. Answer: $8\cdot10^6-10^4=\boxed{7{,}990{,}000}$.\\
+\textbf{Key idea:} multiplication principle + subtract the forbidden block (count how many of the allowed numbers are forbidden).
+\end{exbox}
+
+\begin{exbox}[\#3 Blocks in a line]
+\textbf{Problem.} 12 blocks: 4 red, 6 black, 1 white, 1 blue (same-colour blocks identical). How many different colour sequences in a line?\\
+\textbf{Solution.} This is arrangement of a multiset: $\dfrac{12!}{4!\,6!\,1!\,1!}=\boxed{27{,}720}$. Computation: $\dfrac{12\cdot11\cdot10\cdot9\cdot8\cdot7}{4!}=\dfrac{665{,}280}{24}=27{,}720$ (cancel $6!$ from $12!$ first).
+\end{exbox}
+
+\begin{exbox}[\#4 ``Heads = dots'']
+\textbf{Problem (as I understand it).} Flip two fair coins and roll a fair die. What is the probability that the number of heads equals the number of dots showing on the die?\\
+\textbf{Solution.} The die shows at least 1, so the number of heads must be 1 or 2 (0 heads can never match). By independence: $P(1\text{ head})=\tfrac12$, $P(\text{die}=1)=\tfrac16$; $P(2\text{ heads})=\tfrac14$, $P(\text{die}=2)=\tfrac16$. These cases are mutually exclusive, so
+\[ P=\tfrac12\cdot\tfrac16+\tfrac14\cdot\tfrac16=\tfrac1{12}+\tfrac1{24}=\boxed{\tfrac18}. \]
+\textbf{Key idea:} condition on (partition by) the value of one variable and add; independence lets you multiply.
+\end{exbox}
+
+\begin{exbox}[\#5 Socks]
+\textbf{Problem (as I understand it).} A drawer holds 12 socks: 4 of one colour and 8 of another. Two socks are pulled out at random. What is the probability that they match?\\
+\textbf{Solution.} Unordered view: $N(S)=\binom{12}2=66$ equally likely pairs. Matching pairs: both from the 4: $\binom42=6$; both from the 8: $\binom82=28$. $P=\dfrac{6+28}{66}=\dfrac{34}{66}=\boxed{\tfrac{17}{33}}\approx.515$.\\
+\textbf{Check (ordered view):} $\tfrac4{12}\cdot\tfrac3{11}+\tfrac8{12}\cdot\tfrac7{11}=\tfrac{12+56}{132}=\tfrac{68}{132}=\tfrac{17}{33}$ \checkmark.
+\end{exbox}
+
+\begin{exbox}[\#6 Insurance (inclusion--exclusion, independence)]
+\textbf{Problem.} An insurer has 82 clients; 62 have an auto policy, 37 have a home policy, and every client has at least one of the two. (a) What is the probability that a random client has both? (b) Are ``has auto'' and ``has home'' independent?\\
+\textbf{Solution.} (a) Counts: $N(A\cup H)=N(A)+N(H)-N(AH)$. Since every client has at least one policy, $N(A\cup H)=82$. So $N(AH)=62+37-82=17$ and $P(AH)=\tfrac{17}{82}\approx\boxed{0.207}$.\\
+(b) Independence needs $P(AH)=P(A)P(H)$. $P(A)=\tfrac{62}{82}$, $P(H)=\tfrac{37}{82}$: $P(A)P(H)=\tfrac{62\cdot37}{82^2}=\tfrac{2294}{6724}\approx.341$, while $P(AH)\approx.207$. Not equal, so the events are \textbf{not independent}. (Indeed $P(H\mid A)=\tfrac{17}{62}\approx.274$, whereas $P(H)=\tfrac{37}{82}\approx.451$: knowing a client has auto changes the probability of home.)
+\end{exbox}
+
+\begin{exbox}[\#7 Blood types (Bayes)]
+\textbf{Problem (numbers as I recorded them).} Blood types in the population: $A$: $41\%$, $B$: $9\%$, $AB$: $4\%$, $O$: $46\%$. A lab test reports ``type A'' with probability $.88$ for a type-$A$ person, $.04$ for type $B$, $.10$ for type $AB$, $.04$ for type $O$. Given a test result of ``A'', what is the probability the person is really type $A$?\\
+\textbf{Solution.} Total probability (all the ways the test can say A):
+\[ P(\text{test A})=.41(.88)+.09(.04)+.04(.10)+.46(.04)=.3608+.0036+.0040+.0184=.3868. \]
+Bayes: $P(\text{type }A\mid\text{test }A)=\dfrac{.41(.88)}{.3868}=\dfrac{.3608}{.3868}\approx\boxed{.933}$.
+\end{exbox}
+
+\begin{exbox}[\#8 PMF constant]
+\textbf{Problem.} $P(X=x)=cx^2$ for $x=1,2,3$. Find $c$.\\
+\textbf{Solution.} A PMF sums to 1: $c(1+4+9)=14c=1$, so $c=\boxed{\tfrac1{14}}$ and $p(1)=\tfrac1{14},\;p(2)=\tfrac4{14},\;p(3)=\tfrac9{14}$.\\
+\textbf{(extra follow-ups):} $\E[X]=\frac{1\cdot1+2\cdot4+3\cdot9}{14}=\frac{36}{14}=\frac{18}7\approx2.57$; $\E[X^2]=\frac{1+16+81}{14}=7$; $\Var[X]=7-\left(\tfrac{18}7\right)^2=\tfrac{343-324}{49}=\tfrac{19}{49}\approx.388$.
+\end{exbox}
+
+\clearpage
+%=====================================================================
+\section{Textbook Self-Test Problems: Scope and Full Solutions}\label{sec:selftest}
+%=====================================================================
+
+The professor said to expect \textbf{1--2 problems similar to the Self-Test Problems and Exercises} (the last problem group at the end of each chapter; the book has short answers/solutions in the back). Below: every in-scope Self-Test problem I could read, restated briefly, with a full solution that I worked out and checked numerically. Printed page numbers (10th ed.): Ch.~1 p.~20, Ch.~2 p.~56, Ch.~3 p.~116, Ch.~4 p.~186. \textbf{Try each one before reading the solution.}
+
+\begin{warnbox}[Scope notes]
+\textbf{Skip:} Ch.~1 Self-Test 13, 14 (starred; Sec.~1.6); Ch.~2 Self-Test 16 (partitions of a set into subsets; Sec.~2.6--2.7 material); Ch.~4 Self-Test 4.8 onward (binomial, Poisson, geometric, \dots). Ch.~3: I solved 3.1--3.18; 3.16 needs the circuit figures from the book (Problem 3.70b), so only the method is given. If the book lists further Self-Test problems after the ones below, work them with the same methods.
+\end{warnbox}
+
+%---------------------------------------------------------------------
+\subsection{Chapter 1 Self-Test Problems}
+%---------------------------------------------------------------------
+
+\begin{exbox}[1.1 Arrangements of A, B, C, D, E, F]
+How many linear arrangements of the 6 letters have\\
+\textbf{(a) A and B next to each other?} Glue AB into a block: 5 objects, $5!$ orders, times $2$ for AB/BA: $5!\cdot2=\boxed{240}$.\\
+\textbf{(b) A before B?} By symmetry exactly half of the $6!=720$ orders: $\boxed{360}$.\\
+\textbf{(c) A before B and B before C?} Of the $3!=6$ relative orders of A,B,C only one is allowed: $720/6=\boxed{120}$.\\
+\textbf{(d) A before B and C before D?} The two conditions each hold for half of the orders independently: $720\cdot\tfrac12\cdot\tfrac12=\boxed{180}$.\\
+\textbf{(e) A,B adjacent and C,D adjacent?} Two blocks plus E and F: $4!$ orders, $2\cdot2$ internal orders: $24\cdot4=\boxed{96}$.\\
+\textbf{(f) E not last?} Total minus E last: $720-5!=720-120=\boxed{600}$.
+\end{exbox}
+
+\begin{exbox}[1.2 Seating by nationality]
+4 Americans, 3 French, 3 British in a row, same nationalities adjacent. Order the 3 nationality blocks: $3!$; order within blocks: $4!\,3!\,3!$. Total $6\cdot24\cdot6\cdot6=\boxed{5184}$.
+\end{exbox}
+
+\begin{exbox}[1.3 Officers (president, treasurer, secretary) from 10 people]
+\textbf{(a)} No restrictions: $10\cdot9\cdot8=\boxed{720}$.\\
+\textbf{(b) A and B will not serve together.} Total minus both serve. Both serve: assign them to 2 of the 3 offices ($3\cdot2=6$ ways) and fill the remaining office with one of the other 8 people: $6\cdot8=48$. So $720-48=\boxed{672}$.\\
+\textbf{(c) C and D serve together or not at all.} Together: $6\cdot8=48$ (same count as above). Neither serves: officers from the other 8: $8\cdot7\cdot6=336$. Total $48+336=\boxed{384}$.\\
+\textbf{(d) E must be an officer.} Choose E's office (3 ways), fill the other two from 9 people: $3\cdot9\cdot8=\boxed{216}$.\\
+\textbf{(e) F will serve only if he is president.} Cases: F not serving: $9\cdot8\cdot7=504$; F president: $9\cdot8=72$. Total $\boxed{576}$.
+\end{exbox}
+
+\begin{exbox}[1.4 Choosing 7 of 10 exam questions]
+$\binom{10}7=\boxed{120}$ choices. \emph{At least 3 of the first 5:} let $k$ = number chosen from the first five, so $7-k$ from the last five; need $k\ge3$ and $7-k\le5$. $k=3$: $\binom53\binom54=10\cdot5=50$; $k=4$: $\binom54\binom53=5\cdot10=50$; $k=5$: $\binom55\binom52=10$. Total $\boxed{110}$.
+\end{exbox}
+
+\begin{exbox}[1.5 Dividing 7 gifts among 3 children]
+The eldest gets 3 and the others 2 each: $\dfrac{7!}{3!\,2!\,2!}=\boxed{210}$.
+\end{exbox}
+
+\begin{exbox}[1.6 7-place license plates, 3 letters and 4 digits in any positions]
+Choose which 3 of the 7 slots hold letters: $\binom73=35$. Fill letter slots $26^3$, digit slots $10^4$: $35\cdot26^3\cdot10^4=\boxed{6{,}151{,}600{,}000}$.
+\end{exbox}
+
+\begin{exbox}[1.7 Combinatorial explanation of $\binom nr=\binom n{n-r}$]
+Both count the ways to split $n$ objects into a group of $r$ and a group of $n-r$: choosing the $r$ objects to \emph{include} is the same as choosing the $n-r$ to \emph{leave out}.
+\end{exbox}
+
+\begin{exbox}[1.8 $n$-digit numbers (each digit $0,\dots,9$, leading zeros allowed)]
+\textbf{(a) No two consecutive digits equal:} first digit 10 options, each later digit any of the 9 digits different from its predecessor: $\boxed{10\cdot9^{n-1}}$.\\
+\textbf{(b) Digit 0 appears exactly $i$ times:} choose the $i$ positions of the zeros $\binom ni$, fill the other $n-i$ positions with non-zero digits $9^{n-i}$: $\boxed{\binom ni9^{n-i}}$ ($i=0,\dots,n$).
+\end{exbox}
+
+\begin{exbox}[1.9 Three classes of $n$ students each; choose 3 students from the $3n$]
+\textbf{(a)} $\binom{3n}3$. \textbf{(b) All in the same class:} choose the class (3), then 3 of its $n$: $3\binom n3$. \textbf{(c) Two in one class, one in another:} class for the pair (3), the pair $\binom n2$, third student from the other $2n$ students: $3\binom n2\cdot2n=6n\binom n2$. \textbf{(d) All different classes:} one from each: $n^3$.\\
+\textbf{(e) Identity:} cases (b), (c), (d) are mutually exclusive and exhaustive, so
+\[ \binom{3n}3=3\binom n3+6n\binom n2+n^3. \]
+(Check $n=2$: $\binom63=20$; RHS $=0+12\cdot1+8=20$ \checkmark.)
+\end{exbox}
+
+\begin{exbox}[1.10 5-digit numbers from the digits $1,\dots,9$, no digit more than twice]
+Count by pattern of repeats. \emph{All distinct:} $9\cdot8\cdot7\cdot6\cdot5=15{,}120$. \emph{One pair + 3 singles ($2,1,1,1$):} choose the paired digit (9), the 3 other digits $\binom83=56$, arrange $\frac{5!}{2!}=60$: $9\cdot56\cdot60=30{,}240$. \emph{Two pairs + 1 single ($2,2,1$):} choose the two paired digits $\binom92=36$, the single digit (7 left), arrange $\frac{5!}{2!2!}=30$: $36\cdot7\cdot30=7560$. Total $\boxed{52{,}920}$.\\
+\emph{Check by complement:} all $9^5=59{,}049$ minus those with some digit $\ge3$ times: exactly 3 of a digit $9\binom53 8^2=5760$; exactly 4: $9\cdot5\cdot8=360$; all 5: $9$. $59{,}049-6129=52{,}920$ \checkmark.
+\end{exbox}
+
+\begin{exbox}[1.11 Groups of 6 from 10 married couples with no married couple]
+\textbf{(a)} Choose which 6 of the 10 couples are represented $\binom{10}6=210$, then one member of each: $2^6=64$. $210\cdot64=\boxed{13{,}440}$.\\
+\textbf{(b) With 3 men and 3 women:} choose 3 men $\binom{10}3=120$; the 3 women must come from the 7 women whose husbands were not chosen: $\binom73=35$. $120\cdot35=\boxed{4200}$.
+\end{exbox}
+
+\begin{exbox}[1.12 Committee of 6 from 7 men and 8 women, at least 3 women and at least 2 men]
+Possible compositions: 3 women + 3 men: $\binom83\binom73=56\cdot35=1960$; 4 women + 2 men: $\binom84\binom72=70\cdot21=1470$. (5 women + 1 man violates ``at least 2 men''; 2 women violates ``at least 3 women''.) Total $\boxed{3430}$.
+\end{exbox}
+
+\begin{exbox}[1.15 Posted exam results]
+$n$ students; the posted list names those who passed, in decreasing order of score (no ties). If $k$ pass, the list is an ordered selection of $k$ of the $n$ names: $\frac{n!}{(n-k)!}$ lists. Total $\displaystyle\boxed{\sum_{k=0}^n\frac{n!}{(n-k)!}}$ (the $k=0$ term is the empty list: nobody passed).
+\end{exbox}
+
+\begin{exbox}[1.16 Subsets of size 4 of $\{1,\dots,20\}$ containing at least one of $1,\dots,5$]
+Complement: all $\binom{20}4=4845$ minus those with none of $1,\dots,5$ (choose all 4 from the other 15): $\binom{15}4=1365$. Answer $\boxed{3480}$.
+\end{exbox}
+
+\begin{exbox}[1.17 Identity: $\binom n2=\binom k2+k(n-k)+\binom{n-k}2$, $1\le k\le n$]
+\textbf{Analytic:} RHS $=\dfrac{k(k-1)+(n-k)(n-k-1)}2+k(n-k)=\dfrac{2k^2-2nk+n^2-n}2+kn-k^2=\dfrac{n^2-n}2=\binom n2$.\\
+\textbf{Combinatorial:} choose 2 people from $n$ people split into group 1 (size $k$) and group 2 (size $n-k$): either both from group 1 $\binom k2$, or both from group 2 $\binom{n-k}2$, or one from each $k(n-k)$.
+\end{exbox}
+
+\begin{exbox}[1.18 Parent--child pairs]
+For each family count (number of parents)$\times$(number of children), multiply by the number of such families: $3(1\cdot1)+3(1\cdot2)+5(2\cdot1)+7(2\cdot2)+6(2\cdot3)=3+6+10+28+36=\boxed{83}$.
+\end{exbox}
+
+\begin{exbox}[1.19 8-place plates: 5 letters and 3 digits, no repetitions]
+Choose the 3 digit slots $\binom83=56$; letters ${}_{26}P_5=26\cdot25\cdot24\cdot23\cdot22=7{,}893{,}600$; digits ${}_{10}P_3=720$. Total $56\cdot7{,}893{,}600\cdot720=\boxed{318{,}269{,}952{,}000}$. \emph{If the 3 digits must be consecutive:} the block of 3 can start in 6 places: $6\cdot7{,}893{,}600\cdot720=\boxed{34{,}100{,}352{,}000}$.
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Chapter 2 Self-Test Problems}
+%---------------------------------------------------------------------
+
+\begin{exbox}[2.1 Cafeteria meal]
+Entree (chicken/roast beef), starch (pasta/rice/potatoes), dessert (ice cream/Jello/apple pie/peach). \textbf{(a)} $2\cdot3\cdot4=\boxed{24}$. \textbf{(b)} $A$ = ice cream: $2\cdot3=\boxed6$. \textbf{(c)} $B$ = chicken: $3\cdot4=\boxed{12}$. \textbf{(d)} $AB$ (chicken and ice cream): (chicken, pasta, ice cream), (chicken, rice, ice cream), (chicken, potatoes, ice cream): 3 outcomes. \textbf{(e)} $C$ = rice: $2\cdot4=\boxed8$. \textbf{(f)} $ABC=\{(\text{chicken, rice, ice cream})\}$: $\boxed1$ outcome.
+\end{exbox}
+
+\begin{exbox}[2.2 Suit/shirt/tie]
+Probabilities: suit $.22$, shirt $.30$, tie $.28$; suit\&shirt $.11$, suit\&tie $.14$, shirt\&tie $.10$; all three $.06$.\\
+\textbf{(a) None:} $P(S\cup H\cup T)=.22+.30+.28-.11-.14-.10+.06=.51$, so $P(\text{none})=1-.51=\boxed{.49}$.\\
+\textbf{(b) Exactly one:} only suit $=.22-.11-.14+.06=.03$; only shirt $=.30-.11-.10+.06=.15$; only tie $=.28-.14-.10+.06=.10$. Sum $=\boxed{.28}$.
+\end{exbox}
+
+\begin{exbox}[2.3 14th card in a dealt deck]
+\textbf{14th card is an ace:} by symmetry every position is equally likely to hold any given card, so $\tfrac4{52}=\boxed{\tfrac1{13}}$.\\
+\textbf{First ace is the 14th card:} the first 13 cards are non-aces and the 14th is an ace:
+\[ \frac{48}{52}\cdot\frac{47}{51}\cdots\frac{36}{40}\cdot\frac4{39}=\frac{48\cdot47\cdots36}{52\cdot51\cdots40}\cdot\frac4{39}\approx\boxed{.0312}. \]
+\end{exbox}
+
+\begin{exbox}[2.4 Max/min temperatures]
+$A=$ LA is $70^\circ$ ($P=.3$), $B=$ NY is $70^\circ$ ($P=.4$), $C=$ max of the two is $70^\circ$ ($P=.2$). Let $D=$ min is $70^\circ$. If at least one city is at $70^\circ$ then either max or min is $70^\circ$ (if the other is $\ge70$, the min is 70; if $\le70$ the max is 70), and conversely. So $A\cup B=C\cup D$. Also $CD$ (max and min both 70) $=AB$ (both cities 70). Therefore
+\begin{align*}
+P(A)+P(B)-P(AB)&=P(C)+P(D)-P(CD)\\
+\Rightarrow\quad P(D)&=P(A)+P(B)-P(C)=.3+.4-.2=\boxed{.5}.
+\end{align*}
+\end{exbox}
+
+\begin{exbox}[2.5 Top four cards of a shuffled deck]
+\textbf{(a) Different denominations (ranks):} $\dfrac{52\cdot48\cdot44\cdot40}{52\cdot51\cdot50\cdot49}=\dfrac{48\cdot44\cdot40}{51\cdot50\cdot49}=\dfrac{2816}{4165}\approx\boxed{.676}$.\\
+\textbf{(b) Different suits:} $\dfrac{52\cdot39\cdot26\cdot13}{52\cdot51\cdot50\cdot49}=\dfrac{2197}{20825}\approx\boxed{.1055}$.
+\end{exbox}
+
+\begin{exbox}[2.6 Two urns]
+Urn $A$: 3 red, 3 black; urn $B$: 4 red, 6 black. One ball from each: $P(\text{same})=P(RR)+P(BB)=\tfrac36\cdot\tfrac4{10}+\tfrac36\cdot\tfrac6{10}=.2+.3=\boxed{.5}$.
+\end{exbox}
+
+\begin{exbox}[2.7 Lottery: choose 8 of 40]
+$N(S)=\binom{40}8=76{,}904{,}685$. \textbf{(a)} All 8 match: $\dfrac1{76{,}904{,}685}\approx1.3\times10^{-8}$. \textbf{(b)} Exactly 7 match: choose 7 of the 8 winning numbers and 1 of the 32 others: $\dfrac{8\cdot32}{76{,}904{,}685}=\dfrac{256}{76{,}904{,}685}\approx3.3\times10^{-6}$. \textbf{(c)} At least 6: exactly 6 matches $\binom86\binom{32}2=28\cdot496=13{,}888$; plus 256; plus 1: $\dfrac{14{,}145}{76{,}904{,}685}\approx1.84\times10^{-4}$.
+\end{exbox}
+
+\begin{exbox}[2.8 Committee of 4 from 3 first-years, 4 sophomores, 4 juniors, 3 seniors]
+$N(S)=\binom{14}4=1001$. \textbf{(a) One from each class:} $3\cdot4\cdot4\cdot3=144$; $\tfrac{144}{1001}\approx\boxed{.144}$. \textbf{(b) 2 sophomores and 2 juniors:} $\binom42\binom42=36$; $\tfrac{36}{1001}\approx\boxed{.036}$. \textbf{(c) Only sophomores or juniors:} all 4 from the 8 sophomores/juniors: $\binom84=70$; $\tfrac{70}{1001}=\tfrac{10}{143}\approx\boxed{.070}$.
+\end{exbox}
+
+\begin{exbox}[2.9 Inclusion--exclusion for counts]
+\textbf{(a)} $N(A\cup B)=N(A)+N(B)-N(AB)$: adding $N(A)+N(B)$ counts each element of $AB$ twice, so subtract $N(AB)$ once.\\
+\textbf{(b)} For $N(\bigcup A_i)=\sum N(A_i)-\sum N(A_iA_j)+\cdots+(-1)^{n+1}N(A_1\cdots A_n)$: take an element belonging to exactly $m\ge1$ of the sets. The right side counts it $\binom m1-\binom m2+\cdots+(-1)^{m+1}\binom mm=1-(1-1)^m=1$ time (binomial theorem). Elements in no set are counted 0 times. So the right side counts every element of the union exactly once.
+\end{exbox}
+
+\begin{exbox}[2.10 Six horses]
+$S=6!=720$ finishing orders. $A$: horse 1 among the top three; $B$: horse 2 comes in second. $N(A)=3\cdot5!=360$; $N(B)=5!=120$; $N(AB)$: horse 2 second, horse 1 first or third (2 ways), the other 4 horses in $4!$: $48$. $N(A\cup B)=360+120-48=\boxed{432}$.
+\end{exbox}
+
+\begin{exbox}[2.11 5-card hand with all four suits]
+The suit pattern must be $2,1,1,1$: choose the suit with two cards (4), two cards of that suit $\binom{13}2=78$, one card from each other suit $13^3$: $4\cdot78\cdot2197=685{,}464$. $P=\dfrac{685{,}464}{\binom{52}5}=\dfrac{685{,}464}{2{,}598{,}960}=\dfrac{2197}{8330}\approx\boxed{.264}$.
+\end{exbox}
+
+\begin{exbox}[2.12 Roommates: 6 frontcourt and 4 backcourt players]
+The 10 players are paired into 5 roommate pairs at random: $\dfrac{10!}{2^55!}=945$ equally likely pairings. Exactly two mixed pairs: choose 2 backcourt and 2 frontcourt players for the mixed pairs $\binom42\binom62=90$, match them in $2$ ways, pair the 2 remaining backcourt together (1 way) and split the 4 remaining frontcourt players into 2 pairs (3 ways): $90\cdot2\cdot1\cdot3=540$. $P=\tfrac{540}{945}=\boxed{\tfrac47}\approx.571$.
+\end{exbox}
+
+\begin{exbox}[2.13 Same letter from R E S E R V E and V E R T I C A L]
+Pick one letter at random from each word. Common letters: R (2 of 7 in the first, 1 of 8 in the second), E (3/7, 1/8), V (1/7, 1/8). $P=\tfrac27\cdot\tfrac18+\tfrac37\cdot\tfrac18+\tfrac17\cdot\tfrac18=\tfrac6{56}=\boxed{\tfrac3{28}}\approx.107$.
+\end{exbox}
+
+\begin{exbox}[2.14--2.15 Boole's inequality and a corollary]
+\textbf{2.14.} Define $F_1=E_1$ and $F_i=E_i\left(\bigcup_{j<i}E_j\right)^c$: ``$E_i$ occurs but no earlier $E_j$ does''. The $F_i$ are mutually exclusive, $\bigcup F_i=\bigcup E_i$, and $F_i\subseteq E_i$. So $P(\bigcup E_i)=\sum P(F_i)\le\sum P(E_i)$.\\
+\textbf{2.15.} If $P(E_i)=1$ for all $i\ge1$ then $P(E_i^c)=0$, and by Boole $P\left(\bigcup E_i^c\right)\le\sum0=0$. By De Morgan $P\left(\bigcap E_i\right)=1-P\left(\bigcup E_i^c\right)=1$.
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Chapter 3 Self-Test Problems}
+%---------------------------------------------------------------------
+
+\begin{exbox}[3.1 Bridge: West has no aces; what about his partner?]
+Given West's 13 cards, the other 39 cards (all 4 aces among them) are equally likely to be dealt, so the partner's hand is a random 13-subset of these 39. \textbf{(a)} No aces: $\dfrac{\binom{35}{13}}{\binom{39}{13}}=\dfrac{1150}{6327}\approx\boxed{.182}$. \textbf{(b)} 2 or more aces: $1-\dfrac{\binom{35}{13}+4\binom{35}{12}}{\binom{39}{13}}\approx\boxed{.407}$. \textbf{(c) If West has exactly 1 ace:} 3 aces remain among the 39. No aces: $\dfrac{\binom{36}{13}}{\binom{39}{13}}=\dfrac{200}{703}\approx\boxed{.284}$; 2 or more: $1-\dfrac{\binom{36}{13}+3\binom{36}{12}}{\binom{39}{13}}\approx\boxed{.253}$.
+\end{exbox}
+
+\begin{exbox}[3.2 Battery life]
+$P(>10{,}000)=.8$, $P(>20{,}000)=.4$, $P(>30{,}000)=.1$. Given the battery still works after 10{,}000 miles: \textbf{(a)} $P(\text{total}>20{,}000\mid>10{,}000)=\dfrac{.4}{.8}=\boxed{.5}$ (the event ``$>20{,}000$'' is contained in ``$>10{,}000$''). \textbf{(b)} Additional life $>20{,}000$ means total $>30{,}000$: $\dfrac{.1}{.8}=\boxed{.125}$.
+\end{exbox}
+
+\begin{exbox}[3.3 20 balls (10 white, 10 black) into two urns to maximize $P(\text{white})$]
+An urn is chosen at random, then a ball from it. Put \textbf{1 white ball in urn 1} and the other 19 (9 white, 10 black) in urn 2:
+\[ P(\text{white})=\tfrac12\cdot1+\tfrac12\cdot\tfrac9{19}=\tfrac{14}{19}\approx\boxed{.737}. \]
+(I checked every possible split by computer: this is the maximum. Intuition: urn 1 gives a sure white, and urn 2 keeps a near-half chance.) Compare the naive 5 white and 5 black in each: $.5$.
+\end{exbox}
+
+\begin{exbox}[3.4 Two urns, transfer, Bayes]
+Urn $A$: 2 white, 1 black. Urn $B$: 1 white, 5 black. A ball from $A$ is moved to $B$, then a ball is drawn from $B$ and is white. Let $T=$ ``transferred ball was white'' ($P(T)=\tfrac23$). If $T$: $B$ has 2 W, 5 B: $P(W\mid T)=\tfrac27$. If $T^c$: $B$ has 1 W, 6 B: $P(W\mid T^c)=\tfrac17$.
+\[ P(T\mid W)=\frac{\frac23\cdot\frac27}{\frac23\cdot\frac27+\frac13\cdot\frac17}=\frac{4/21}{5/21}=\boxed{\tfrac45}. \]
+\end{exbox}
+
+\begin{exbox}[3.5 Urn with $r$ red and $w$ white balls removed one at a time]
+$R_i=$ ``the $i$th ball removed is red''. \textbf{(a)} By symmetry (the removal order is a uniformly random arrangement, so any position is equally likely to hold any given ball), $P(R_i)=\dfrac r{r+w}$. \textbf{(b),(c)} For two different positions $i\neq j$: given $R_i$, the $j$th ball is a random one of the other $r+w-1$ balls, of which $r-1$ are red: $P(R_j\mid R_i)=\dfrac{r-1}{r+w-1}$. This is the answer whichever of the positions comes first (e.g.\ $P(R_5\mid R_3)=P(R_3\mid R_5)=\frac{r-1}{r+w-1}$).
+\end{exbox}
+
+\begin{exbox}[3.6 P\'olya's urn]
+$b$ black and $r$ red balls; draw one, return it plus $c$ more of the same colour, draw again. Show $P(\text{1st black}\mid\text{2nd red})=\dfrac b{b+r+c}$.\\
+$P(B_1R_2)=\dfrac b{b+r}\cdot\dfrac r{b+r+c}$; $P(R_1R_2)=\dfrac r{b+r}\cdot\dfrac{r+c}{b+r+c}$. So $P(R_2)=\dfrac{br+r(r+c)}{(b+r)(b+r+c)}=\dfrac{r(b+r+c)}{(b+r)(b+r+c)}=\dfrac r{b+r}$. Then $P(B_1\mid R_2)=\dfrac{br/[(b+r)(b+r+c)]}{r/(b+r)}=\dfrac b{b+r+c}$ \checkmark.
+\end{exbox}
+
+\begin{exbox}[3.7 Two cards from a deck; probability both are aces given\dots]
+\textbf{(a) \dots one of the cards is the ace of spades:} the possible pairs containing $A\spadesuit$ number 51; those where the other card is an ace: 3. $\tfrac3{51}=\boxed{\tfrac1{17}}$. \textbf{(b) \dots the first card is an ace:} $\tfrac3{51}=\boxed{\tfrac1{17}}$. \textbf{(c) \dots the second card is an ace:} $\tfrac3{51}=\boxed{\tfrac1{17}}$ (symmetry). \textbf{(d) \dots at least one is an ace:} $\dfrac{P(\text{both})}{P(\text{at least one})}=\dfrac{\binom42/\binom{52}2}{1-\binom{48}2/\binom{52}2}=\dfrac6{1326-1128}=\dfrac6{198}=\boxed{\tfrac1{33}}$. (Notice how the way the information is obtained changes the answer.)
+\end{exbox}
+
+\begin{exbox}[3.8 Odds form and a comparison]
+Using Bayes, $P(H\mid E)=\dfrac{P(H)P(E\mid H)}{P(E)}$ and $P(G\mid E)=\dfrac{P(G)P(E\mid G)}{P(E)}$; dividing, $\dfrac{P(H\mid E)}{P(G\mid E)}=\dfrac{P(H)P(E\mid H)}{P(G)P(E\mid G)}$. Here $\dfrac{P(H)}{P(G)}=3$ and $P(E\mid G)=2P(E\mid H)$ so $\dfrac{P(E\mid H)}{P(E\mid G)}=\tfrac12$: the posterior ratio is $3\cdot\tfrac12=\tfrac32>1$. \textbf{$H$ is still more likely} (odds $3:2$).
+\end{exbox}
+
+\begin{exbox}[3.9 Plant and neighbour]
+Neighbour waters w.p.\ $.9$ (forgets w.p.\ $.1$); plant dies w.p.\ $.8$ without water, $.15$ with water. \textbf{(a)} $P(\text{alive})=.9(.85)+.1(.2)=.765+.02=\boxed{.785}$. \textbf{(b)} $P(\text{forgot}\mid\text{dead})=\dfrac{.1(.8)}{.1(.8)+.9(.15)}=\dfrac{.08}{.215}=\dfrac{16}{43}\approx\boxed{.372}$.
+\end{exbox}
+
+\begin{exbox}[3.10 Six balls from an urn with 8 red, 10 green, 12 blue (30 total)]
+\textbf{(a)} $P(\text{at least one red})=1-\dfrac{\binom{22}6}{\binom{30}6}=1-\dfrac{74{,}613}{593{,}775}\approx\boxed{.874}$. \textbf{(b)} Given no red balls are chosen, the six are a random sample from the 22 non-red (10 green, 12 blue): $P(\text{exactly 2 green})=\dfrac{\binom{10}2\binom{12}4}{\binom{22}6}=\dfrac{45\cdot495}{74{,}613}=\dfrac{675}{2261}\approx\boxed{.299}$.
+\end{exbox}
+
+\begin{exbox}[3.11 Batteries]
+Type C works w.p.\ $.7$, type D w.p.\ $.4$; the bin has 8 C and 6 D. \textbf{(a)} $P(\text{works})=\tfrac8{14}(.7)+\tfrac6{14}(.4)=\tfrac{5.6+2.4}{14}=\tfrac8{14}=\boxed{\tfrac47}$. \textbf{(b)} $P(C\mid\text{not work})=\dfrac{\frac8{14}(.3)}{\frac8{14}(.3)+\frac6{14}(.6)}=\dfrac{2.4}{2.4+3.6}=\boxed{.4}$.
+\end{exbox}
+
+\begin{exbox}[3.12 Maria's books]
+$P(L_1)=.6$, $P(L_2)=.5$, $P(L_1L_2)=.4$. $P(L_2\mid L_1^c)=\dfrac{P(L_2L_1^c)}{P(L_1^c)}=\dfrac{.5-.4}{1-.6}=\dfrac{.1}{.4}=\boxed{.25}$.
+\end{exbox}
+
+\begin{exbox}[3.13 Colours depleted in order]
+The balls are removed in a uniformly random order. \textbf{(a) 20 red, 10 blue: all red removed before all blue}  iff the \emph{last} ball is blue: $\tfrac{10}{30}=\boxed{\tfrac13}$. \textbf{(b)} With 8 green added, ``all reds are removed before all blues'' depends only on the relative order of the red and blue balls (a uniformly random order of those 30), so the probability is still $\boxed{\tfrac13}$. \textbf{(c) Order blue, red, green:} the last ball overall must be green ($\tfrac8{38}$), and among the other 37 balls the last one must be red (given that, $\tfrac{20}{30}$ by symmetry): $\tfrac8{38}\cdot\tfrac{20}{30}=\boxed{\tfrac8{57}}\approx.140$. \textbf{(d) Blue is the first group removed:} order blue, red, green or blue, green, red. The second: last ball red ($\tfrac{20}{38}$), and among the other 37 the last of blue/green is green ($\tfrac8{18}$): $\tfrac{20}{38}\cdot\tfrac8{18}=\tfrac{40}{171}$. Total $\tfrac8{57}+\tfrac{40}{171}=\tfrac{24+40}{171}=\boxed{\tfrac{64}{171}}\approx.374$. (Verified by simulation.)
+\end{exbox}
+
+\begin{exbox}[3.14 A forgets the coin flip]
+Coin lands heads w.p.\ $.8$. A forgets w.p.\ $.4$ and then says heads or tails with equal probability. \textbf{(a) $B$ is told heads:} if the coin is heads ($.8$): A says heads w.p.\ $.6+.4(.5)=.8$; if tails ($.2$): A says heads w.p.\ $.4(.5)=.2$. $P=.8(.8)+.2(.2)=.64+.04=\boxed{.68}$. \textbf{(b) $B$ is told the correct result:} A remembers ($.6$): correct; forgets ($.4$): correct w.p.\ $.5$. $.6+.4(.5)=\boxed{.8}$. \textbf{(c)} $P(\text{heads}\mid\text{told heads})=\dfrac{.8(.8)}{.68}=\dfrac{.64}{.68}=\boxed{\tfrac{16}{17}}\approx.941$.
+\end{exbox}
+
+\begin{exbox}[3.15 Rats with black dominant]
+A black rat has two black parents and a brown sibling. The brown sibling is $bb$, so each parent carries a $b$ gene; both parents are $Bb$. A child of $Bb\times Bb$ is $BB,Bb,Bb,bb$ with prob.\ $\tfrac14,\tfrac14,\tfrac14,\tfrac14$; given the child is black: $P(BB)=\tfrac13$, $P(Bb)=\tfrac23$. \textbf{(a)} $P(\text{pure black})=\boxed{\tfrac13}$. \textbf{(b)} Mated with a brown ($bb$) rat, all 5 offspring are black. If our rat is $BB$: probability 1. If $Bb$: $(\tfrac12)^5=\tfrac1{32}$. Bayes: $\dfrac{\frac13\cdot1}{\frac13\cdot1+\frac23\cdot\frac1{32}}=\dfrac{1/3}{1/3+1/48}=\dfrac{16}{17}\approx\boxed{.941}$.
+\end{exbox}
+
+\begin{exbox}[3.16--3.17 Systems]
+\textbf{3.16} needs the relay figure from Problem 3.70b in the book. Method: condition on whether relay 1 closes, $P(\text{current flows})=P(\text{flow}\mid R_1)P(R_1)+P(\text{flow}\mid R_1^c)P(R_1^c)$; then use Bayes for part (b).\\
+\textbf{3.17} A $k$-out-of-$n$ system works if at least $k$ of its $n$ components work; each component works independently w.p.\ $\tfrac12$. \textbf{(a) $k=1,n=2$:} $P(\text{system works})=1-\tfrac14=\tfrac34$; $P(\text{comp.\ 1 works and system works})=P(\text{comp.\ 1 works})=\tfrac12$. Conditional $=\dfrac{1/2}{3/4}=\boxed{\tfrac23}$. \textbf{(b) $k=2,n=3$:} $P(\text{system works})=P(\ge2\text{ of }3)=\tfrac{3+1}8=\tfrac12$. $P(\text{comp.\ 1 works and at least one of the other two works})=\tfrac12\cdot\tfrac34=\tfrac38$. Conditional $=\dfrac{3/8}{1/2}=\boxed{\tfrac34}$.
+\end{exbox}
+
+\begin{exbox}[3.18 Mr.\ Jones's roulette system]
+Spins are independent. Bet on red only after 10 straight blacks; he reasons that 11 straight blacks is very unlikely so he will win. But \emph{given} the first 10 spins were black, the probability that the 11th is red is still the unconditional $\tfrac{18}{38}$: $P(\text{11th red}\mid\text{10 blacks})=P(\text{11th red})$ by independence. The wheel has no memory (the ``gambler's fallacy''). His probability of winning each bet is $\tfrac{18}{38}<\tfrac12$, so he still loses money on average.
+\end{exbox}
+
+%---------------------------------------------------------------------
+\subsection{Chapter 4 Self-Test Problems (only 4.1--4.6 are in scope)}
+%---------------------------------------------------------------------
+
+\begin{exbox}[4.1 Baseball hits]
+$X=$ number of hits in 3 at-bats. $P(X=1)=.3$, $P(X=2)=.2$, $P(X=0)=3P(X=3)$. Total probability 1: $3P(3)+.3+.2+P(3)=1\Rightarrow4P(3)=.5$, so $P(X=3)=.125$, $P(X=0)=.375$. $\E[X]=0(.375)+1(.3)+2(.2)+3(.125)=\boxed{1.075}$.
+\end{exbox}
+
+\begin{exbox}[4.2 Ratio condition]
+$X\in\{0,1,2\}$ and $P(X=i)=c\,P(X=i-1)$ for $i=1,2$. Then $p(1)=c\,p(0)$, $p(2)=c^2p(0)$, and $p(0)(1+c+c^2)=1$, so $p(0)=\dfrac1{1+c+c^2}$. $\E[X]=p(1)+2p(2)=\boxed{\dfrac{c+2c^2}{1+c+c^2}}$.
+\end{exbox}
+
+\begin{exbox}[4.3 Coin flipped until heads or tails has occurred twice]
+Heads w.p.\ $p$, $q=1-p$. Stop after 2 flips if $HH$ or $TT$: probability $p^2+q^2$. Otherwise the first two flips are one of each (probability $2pq$) and the third flip necessarily gives a second head or second tail, so the process stops after exactly 3 flips. $N=2$ w.p.\ $p^2+q^2$, $N=3$ w.p.\ $2pq$. $\E[N]=2(p^2+q^2)+3(2pq)=2(p+q)^2+2pq=\boxed{2+2pq}=2+2p(1-p)$. (For a fair coin: $2.5$.)
+\end{exbox}
+
+\begin{exbox}[4.4 Family sizes (the ``bus paradox'' again)]
+$m$ families, $n_i$ of them have $i$ children ($\sum n_i=m$). $X=$ number of children in a randomly chosen \emph{family}; $Y=$ number of children in the family of a randomly chosen \emph{child}. Total children $c=\sum in_i$. $P(X=i)=\tfrac{n_i}m$, so $\E[X]=\dfrac{\sum in_i}m=\dfrac cm$. A family with $i$ children contains $i$ of the $c$ children, so $P(Y=i)=\dfrac{in_i}c$ and $\E[Y]=\dfrac{\sum i^2n_i}c$. Now $\sum i^2n_i/m=\E[X^2]$, so $\E[Y]=\dfrac{m\,\E[X^2]}c=\dfrac{\E[X^2]}{\E[X]}$. Since $\Var[X]=\E[X^2]-(\E[X])^2\ge0$, $\E[X^2]\ge(\E[X])^2$, hence $\E[Y]\ge\E[X]$. \hfill $\blacksquare$ (Big families are over-represented when you sample children.)
+\end{exbox}
+
+\begin{exbox}[{4.5 Find $P(X=0)$ from $\E[X]=3\Var[X]$}]
+$P(X=0)=1-P(X=1)$ so $X\in\{0,1\}$. Let $p=P(X=1)$: $\E[X]=p$, $\E[X^2]=p$, $\Var[X]=p-p^2=p(1-p)$. Condition: $p=3p(1-p)$. For $p\ne0$ divide by $p$: $1=3(1-p)$, so $p=\tfrac23$ and $P(X=0)=\boxed{\tfrac13}$. (The degenerate case $p=0$, i.e.\ $X\equiv0$, also satisfies the equation trivially; the intended answer is $\tfrac13$.)
+\end{exbox}
+
+\begin{exbox}[4.6 Buying information about a coin]
+Two coins, heads probabilities $.6$ and $.3$; one is chosen at random and flipped; you bet any amount $x\le\$10$ (win $x$ on heads, lose $x$ on tails). \textbf{Without information:} $P(\text{heads})=\tfrac12(.6)+\tfrac12(.3)=.45$, so a bet of $x$ has expected payoff $x(.45)-x(.55)=-.1x\le0$: best is to bet nothing, expected payoff $0$. \textbf{With information (cost $C$):} if the coin is the $.6$ coin, bet $\$10$: expected $10(.6)-10(.4)=2$ minus $C$; if it is the $.3$ coin, bet $0$ (bets have negative expectation): payoff $-C$. $\E[\text{payoff}]=\tfrac12(2-C)+\tfrac12(-C)=\boxed{1-C}$. It pays to buy the information when $1-C>0$, i.e.\ \textbf{$C<\$1$}.
+\end{exbox}
+
+\begin{exbox}[4.7 (optional) The two envelopes / philanthropist]
+\textbf{(a)} If you turn over the red paper and see $x$, the blue paper is $2x$ or $x/2$ with probability $\tfrac12$ each: expected blue $=\tfrac12(2x)+\tfrac12(x/2)=1.25x>x$, so switching always helps; you gain nothing by looking at the red one first. \textbf{(b)} Strategy: turn over blue; keep it if its value is $\ge y$, else switch to red. The reward $R(x)$ when $x$ is written on red: if $y\le x/2$ both possible blue values are $\ge y$, so you always keep blue: $\E=\tfrac12(2x+x/2)=1.25x$. If $x/2<y\le2x$: blue $=2x$ is kept (reward $2x$), blue $=x/2<y$ makes you switch (reward $x$): $\E=\tfrac12(2x+x)=1.5x$. If $y>2x$: you always switch: $\E=x$. So $\E[R(x)]=\begin{cases}1.25x&y\le x/2\\1.5x&x/2<y\le2x\\x&y>2x\end{cases}$; always keeping blue gives $1.25x$.
+\end{exbox}
+
+\clearpage
+%=====================================================================
+\section{Playbook, Proof Checklist, and Common Traps}\label{sec:playbook}
+%=====================================================================
+
+\begin{methodbox}[Decision guide: ``what kind of problem is this?'']
+\begin{enumerate}
+\item \textbf{``How many ways \dots''} $\to$ Chapter 1. Ordered? repeated objects? labelled groups? restrictions $\to$ glue / complement / casework.
+\item \textbf{``Probability that \dots, at random / fair''} with a finite set of equally likely outcomes $\to$ $N(E)/N(S)$, counting both the same way.
+\item \textbf{``At least one'', ``neither'', ``or''} $\to$ complement or inclusion--exclusion. Fill a Venn box / 3-circle Venn from the middle outward.
+\item \textbf{``Given that'', ``if it is known''} $\to$ conditional probability; for sequences, the multiplication rule/tree.
+\item \textbf{A result is observed and you want the probability of an underlying cause} $\to$ total probability + Bayes (tree).
+\item \textbf{``Independent''; repeated identical trials} $\to$ multiply; ``at least one success'' $=1-(1-p)^n$; ``$E$ before $F$'' $=\frac{P(E)}{P(E)+P(F)}$.
+\item \textbf{A numerical quantity with a distribution} $\to$ PMF table; check sum $=1$; $\E[X]$, $\E[X^2]$, $\Var[X]=\E[X^2]-(\E[X])^2$; linear rules for $aX+b$.
+\end{enumerate}
+\end{methodbox}
+
+\begin{defbox}[Proofs the professor might ask you to reproduce (one-line skeletons)]
+\begin{itemize}
+\item \textbf{Multiplication principle:} list outcomes as an $m\times n$ array.
+\item \textbf{Pascal's identity:} fix object 1: in the group or not.
+\item \textbf{Binomial theorem (combinatorial):} each term chooses $x$ or $y$ from each factor; $\binom nk$ ways to choose which $k$ give $x$.
+\item \textbf{Number of subsets $=2^n$:} each element in or out; or binomial theorem with $x=y=1$.
+\item \textbf{Complement rule:} $1=P(S)=P(E)+P(E^c)$.
+\item \textbf{Monotonicity:} $F=E\cup E^cF$ disjoint.
+\item \textbf{$P(E\cup F)$:} $E\cup F=E\cup E^cF$ and $P(E^cF)=P(F)-P(EF)$.
+\item \textbf{Multiplication rule (general):} chain of definitions telescopes.
+\item \textbf{Total probability and Bayes:} $E=\bigcup EF_i$ (disjoint); Bayes = multiplication rule over total probability.
+\item \textbf{$E,F$ independent $\Rightarrow$ $E,F^c$ independent:} $P(EF^c)=P(E)-P(E)P(F)$.
+\item \textbf{$\E[g(X)]=\sum g(x)p(x)$:} group terms with the same $g$-value.
+\item \textbf{$\E[aX+b]=a\E[X]+b$:} split the sum, $\sum p=1$.
+\item \textbf{$\Var[X]=\E[X^2]-(\E[X])^2$:} expand $(x-\mu)^2$.
+\item \textbf{$\Var[aX+b]=a^2\Var[X]$:} $(ax+b-(a\mu+b))^2=a^2(x-\mu)^2$.
+\end{itemize}
+\end{defbox}
+
+\begin{warnbox}[Top 15 traps (read the night before)]
+\begin{enumerate}
+\item Using $N(E)/N(S)$ when outcomes are not equally likely (sums, ``number of heads'').
+\item Ordered numerator, unordered denominator (or vice versa).
+\item Forgetting identical objects: divide by $n_i!$.
+\item Unlabeled equal groups: divide by (number of groups)!.
+\item Subtracting the wrong number of forbidden cases ($10^3(26^4-7)$, not $10^3\cdot26^4-7$).
+\item $P(A\cup B)=P(A)+P(B)$ without checking mutual exclusivity.
+\item Mutually exclusive $\ne$ independent (mutually exclusive events with positive probability are \emph{dependent}).
+\item Swapping $P(E\mid F)$ and $P(F\mid E)$.
+\item Bayes denominator not including \emph{all} causes.
+\item Pairwise independence $\Rightarrow$ independence (false for 3+ events).
+\item Treating draws \emph{without} replacement as independent.
+\item $\E[X^2]=(\E[X])^2$ (false; the gap is the variance).
+\item $\Var[aX]=a\Var[X]$ (it is $a^2$) and $\Var[X+b]=\Var[X]+b$ (it is unchanged).
+\item PMF that doesn't sum to 1, CDF that decreases, probability $>1$ or $<0$.
+\item Giving a decimal when the exact fraction was easy, or vice versa---and not boxing the answer.
+\end{enumerate}
+\end{warnbox}
+
+\begin{methodbox}[Two-day exam-eve checklist]
+\begin{itemize}
+\item Re-do each worked solution in Sec.~\ref{sec:practice} (review sheet) with the answer covered.
+\item Re-do the Self-Test problems in Sec.~\ref{sec:selftest}, at least 1.1, 1.3, 1.4, 1.9--1.12, 2.2, 2.3, 2.5, 2.7, 2.10--2.12, 3.1, 3.4, 3.9--3.15, 4.1--4.6.
+\item Write the definitions (a)--(s) from Sec.~\ref{sec:checklist} from memory, then compare.
+\item Memorize the formula sheet below.
+\item Practice \textbf{Bayes with a tree} twice, \textbf{inclusion--exclusion with 3 events} twice, and a \textbf{PMF/CDF/$\E$/Var table} twice.
+\end{itemize}
+\end{methodbox}
+
+\clearpage
+%=====================================================================
+\section{Quick-Reference Formula Sheet}\label{sec:formulas}
+%=====================================================================
+
+\begin{multicols}{2}
+\small
+\textbf{Counting}\\[2pt]
+Multiplication: $n_1n_2\cdots n_r$\\
+Factorial: $n!=n(n-1)\cdots1$, $0!=1$\\
+Permutations: ${}_nP_r=\dfrac{n!}{(n-r)!}$\\
+With repeats: $\dfrac{n!}{n_1!\cdots n_k!}$\\
+Combinations: $\dbinom nr=\dfrac{n!}{r!(n-r)!}=\dbinom n{n-r}$\\
+Pascal: $\dbinom nr=\dbinom{n-1}{r-1}+\dbinom{n-1}r$\\
+Binomial: $(x+y)^n=\sum_{k=0}^n\dbinom nkx^ky^{n-k}$\\
+$\sum_k\dbinom nk=2^n$, $\sum_k(-1)^k\dbinom nk=0$\\
+Multinomial: $\dbinom n{n_1,\dots,n_r}=\dfrac{n!}{n_1!\cdots n_r!}$\\
+Unlabeled equal groups: divide by (\#groups)!
+
+\medskip
+\textbf{Sets / events}\\[2pt]
+$(A\cup B)^c=A^cB^c$, $(AB)^c=A^c\cup B^c$\\
+$A\cup B$: or; $AB$: and; $A^c$: not\\
+Mutually exclusive: $AB=\emptyset$\\
+Partition: mutually exclusive + exhaustive
+
+\medskip
+\textbf{Probability basics}\\[2pt]
+Axioms: $0\le P(E)\le1$; $P(S)=1$; additivity for mutually exclusive events\\
+$P(E^c)=1-P(E)$\\
+$P(E\cup F)=P(E)+P(F)-P(EF)$\\
+$P(E\cup F\cup G)=\sum P(\cdot)-\sum P(\cdot\cdot)+P(EFG)$\\
+$P(\bigcup E_i)\le\sum P(E_i)$\\
+$E\subseteq F\Rightarrow P(E)\le P(F)$\\
+Equally likely: $P(E)=\dfrac{N(E)}{N(S)}$\\
+Birthday: $P(\text{no match})=\dfrac{{}_{365}P_n}{365^n}$\\
+Matching: $P(\text{no match})\to e^{-1}$
+
+\columnbreak
+
+\textbf{Conditional / independence}\\[2pt]
+$P(E\mid F)=\dfrac{P(EF)}{P(F)}$\\
+$P(EF)=P(F)P(E\mid F)$\\
+$P(E_1\cdots E_n)=P(E_1)P(E_2\mid E_1)\cdots$\\
+Total prob.: $P(E)=\sum_iP(E\mid F_i)P(F_i)$\\
+Bayes: $P(F_j\mid E)=\dfrac{P(E\mid F_j)P(F_j)}{P(E)}$\\
+Odds: $\dfrac{P(A)}{1-P(A)}$; new odds = old odds $\times\dfrac{P(E\mid H)}{P(E\mid H^c)}$\\
+Independent: $P(EF)=P(E)P(F)$ (all subcollections for 3+)\\
+At least one in $n$ trials: $1-(1-p)^n$\\
+$E$ before $F$: $\dfrac{P(E)}{P(E)+P(F)}$
+
+\medskip
+\textbf{Random variables}\\[2pt]
+PMF: $p(x)=P(X=x)\ge0$, $\sum p=1$\\
+CDF: $F(x)=P(X\le x)$; $P(a<X\le b)=F(b)-F(a)$; $P(X>a)=1-F(a)$\\
+$\E[X]=\sum xp(x)$\\
+$\E[g(X)]=\sum g(x)p(x)$\\
+$\E[aX+b]=a\E[X]+b$\\
+$\E[I_A]=P(A)$\\
+$\Var[X]=\E[(X-\mu)^2]=\E[X^2]-(\E[X])^2$\\
+$\Var[aX+b]=a^2\Var[X]$; $\SD=\sqrt{\Var}$\\
+Indicator: $\Var=p(1-p)$\\
+$\Var[X+Y]=\Var[X]+\Var[Y]$ if independent
+\end{multicols}
+
+\vfill
+\begin{center}\emph{Good luck on Thursday, Oct.\ 15!}\end{center}
+
+\end{document}
